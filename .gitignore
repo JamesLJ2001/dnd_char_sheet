@@ -1,0 +1,13 @@
+# Java 垃圾
+target/
+*.class
+.idea/
+*.iml
+
+# Vue/Node 垃圾
+node_modules/
+dist/
+npm-debug.log
+
+# Mac/Linux 系统垃圾
+.DS_Store
