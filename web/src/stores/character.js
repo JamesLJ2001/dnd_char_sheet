@@ -11,7 +11,7 @@ export const useCharacterStore = defineStore('character', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await axios.get('http://localhost:8080/api/characters')
+      const response = await axios.get('/api/characters')
       characters.value = response.data
     } catch (err) {
       error.value = err.message
@@ -23,8 +23,7 @@ export const useCharacterStore = defineStore('character', () => {
 
   async function updateCharacter(id, payload) {
     try {
-      const response = await axios.patch(`http://localhost:8080/api/characters/${id}`, payload)
-      // 更新本地状态
+      const response = await axios.put(`/api/characters/${id}`, payload);      // 更新本地状态
       const index = characters.value.findIndex(char => char.id === id)
       if (index !== -1) {
         characters.value[index] = { ...characters.value[index], ...response.data }

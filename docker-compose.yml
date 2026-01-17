@@ -1,16 +1,59 @@
 version: '3.8'
+
 services:
+  # 1. 数据库 (保持不变)
   db:
-    image: postgres:latest
-    container_name: dnd-db
+    image: postgres:15
+    container_name: dnd-prod-db
     restart: always
     environment:
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123456
-      POSTGRES_DB: dnd_database
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: postgres
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - dnd-network
+
+  # 2. 后端 (保持不变)
+  backend:
+    build: ./server
+    container_name: dnd-prod-backend
+    restart: always
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 123456
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      - dnd-network
+
+  # 3. 前端 (保持不变)
+  frontend:
+    build: ./web
+    container_name: dnd-prod-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - dnd-network
+
+  # --- 新增的部分：Cloudflare Tunnel ---
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: dnd-tunnel
+    restart: always
+    command: tunnel --no-autoupdate run --token eyJhIjoiMzIxMGE4NDBjNmY3NDMwNjgwMzRhMjdkZGI0YWVmYmUiLCJ0IjoiYzhmNzI0YjctMDdmMC00ZTVjLWJiNjMtYmU1OWM3OTg3MjNhIiwicyI6Ik5tSm1PV1kzWmprdE16WmhZUzAwWm1FMkxXRmpPRFl0TnpFek5qSmpPVFV3WlRKayJ9
+    networks:
+      - dnd-network
 
 volumes:
-  db_data:
+  postgres_data:
+
+networks:
+  dnd-network:
+    driver: bridge
