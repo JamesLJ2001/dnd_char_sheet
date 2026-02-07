@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCharacterStore } from '../stores/character'
 
@@ -8,8 +8,10 @@ const router = useRouter()
 const characterStore = useCharacterStore()
 
 const characterId = computed(() => parseInt(route.params.id))
-const character = ref(null)
 const loading = ref(true)
+
+// 使用 computed 确保 iOS Safari 上的响应式更新
+const character = computed(() => characterStore.getCharacterById(characterId.value))
 
 // 六维属性数据
 const stats = computed(() => {
@@ -172,10 +174,11 @@ const saves = computed(() => {
 async function adjustHp(delta) {
   try {
     await characterStore.adjustHp(characterId.value, delta)
-    character.value = characterStore.getCharacterById(characterId.value)
+    // 使用 nextTick 确保 iOS Safari 触发响应式更新
+    await nextTick()
 
     // 检测死亡
-    if (character.value.currentHp <= 0) {
+    if (character.value && character.value.currentHp <= 0) {
       showDeathModal.value = true
     }
   } catch (err) {
@@ -188,7 +191,7 @@ async function useResource(resource) {
   if (resource.currentValue <= 0) return
   try {
     await characterStore.updateResource(characterId.value, resource.id, -1)
-    character.value = characterStore.getCharacterById(characterId.value)
+    await nextTick() // 确保 iOS Safari 触发响应式更新
   } catch (err) {
     console.error('Failed to use resource:', err)
   }
@@ -199,7 +202,7 @@ async function recoverResource(resource) {
   if (resource.currentValue >= resource.maxValue) return
   try {
     await characterStore.updateResource(characterId.value, resource.id, 1)
-    character.value = characterStore.getCharacterById(characterId.value)
+    await nextTick() // 确保 iOS Safari 触发响应式更新
   } catch (err) {
     console.error('Failed to recover resource:', err)
   }
@@ -209,7 +212,7 @@ async function recoverResource(resource) {
 async function longRest() {
   try {
     await characterStore.longRest(characterId.value)
-    character.value = characterStore.getCharacterById(characterId.value)
+    await nextTick() // 确保 iOS Safari 触发响应式更新
   } catch (err) {
     console.error('Failed to long rest:', err)
   }
@@ -458,7 +461,7 @@ async function adjustLevel(delta) {
 
   try {
     await characterStore.updateCharacter(characterId.value, { level: newLevel })
-    character.value = characterStore.getCharacterById(characterId.value)
+    await nextTick() // 确保 iOS Safari 触发响应式更新
   } catch (err) {
     console.error('Failed to adjust level:', err)
   }
@@ -473,7 +476,7 @@ async function adjustStat(statName, delta) {
 
   try {
     await characterStore.updateCharacter(characterId.value, { [statName]: newValue })
-    character.value = characterStore.getCharacterById(characterId.value)
+    await nextTick() // 确保 iOS Safari 触发响应式更新
   } catch (err) {
     console.error('Failed to adjust stat:', err)
   }
@@ -481,9 +484,9 @@ async function adjustStat(statName, delta) {
 
 onMounted(async () => {
   await characterStore.fetchCharacters()
-  character.value = characterStore.getCharacterById(characterId.value)
   loading.value = false
 
+  // computed 会自动更新，但检查是否需要跳转
   if (!character.value) {
     router.push('/')
   }

@@ -24,10 +24,10 @@ export const useCharacterStore = defineStore('character', () => {
   async function updateCharacter(id, payload) {
     try {
       const response = await axios.put(`/api/characters/${id}`, payload)
-      // 更新本地状态
+      // 更新本地状态 - 使用 splice 确保 iOS Safari 触发响应式更新
       const index = characters.value.findIndex(char => char.id === id)
       if (index !== -1) {
-        characters.value[index] = { ...characters.value[index], ...response.data }
+        characters.value.splice(index, 1, { ...characters.value[index], ...response.data })
       }
       return response.data
     } catch (err) {
@@ -39,10 +39,10 @@ export const useCharacterStore = defineStore('character', () => {
   async function adjustHp(charId, delta) {
     try {
       const response = await axios.patch(`/api/characters/${charId}/hp`, { delta })
-      // 更新本地状态
+      // 更新本地状态 - 使用 splice 确保 iOS Safari 触发响应式更新
       const index = characters.value.findIndex(char => char.id === charId)
       if (index !== -1) {
-        characters.value[index] = { ...characters.value[index], ...response.data }
+        characters.value.splice(index, 1, { ...characters.value[index], ...response.data })
       }
       return response.data
     } catch (err) {
@@ -54,10 +54,10 @@ export const useCharacterStore = defineStore('character', () => {
   async function updateResource(charId, resId, delta) {
     try {
       const response = await axios.patch(`/api/characters/${charId}/resources/${resId}`, { delta })
-      // 更新本地状态
+      // 更新本地状态 - 使用 splice 确保 iOS Safari 触发响应式更新
       const index = characters.value.findIndex(char => char.id === charId)
       if (index !== -1) {
-        characters.value[index] = { ...characters.value[index], ...response.data }
+        characters.value.splice(index, 1, { ...characters.value[index], ...response.data })
       }
       return response.data
     } catch (err) {
@@ -69,10 +69,10 @@ export const useCharacterStore = defineStore('character', () => {
   async function longRest(charId) {
     try {
       const response = await axios.post(`/api/characters/${charId}/long-rest`)
-      // 更新本地状态
+      // 更新本地状态 - 使用 splice 确保 iOS Safari 触发响应式更新
       const index = characters.value.findIndex(char => char.id === charId)
       if (index !== -1) {
-        characters.value[index] = { ...characters.value[index], ...response.data }
+        characters.value.splice(index, 1, { ...characters.value[index], ...response.data })
       }
       return response.data
     } catch (err) {
