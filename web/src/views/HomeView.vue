@@ -155,7 +155,7 @@ const buildTime = new Date().toLocaleString('zh-CN')
       </div>
 
       <!-- 底部装饰 -->
-      <div class="text-center mt-16">
+      <div class="text-center mt-16 mb-8">
         <p class="text-lg font-heading font-bold" style="color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">🎲 Dungeons & Dragons 角色表 v2.0</p>
         <p class="text-sm mt-2 font-body" style="color: #c4a777;">中世纪复古风格</p>
         <!-- 调试信息 -->

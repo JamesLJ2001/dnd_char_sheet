@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCharacterStore } from '../stores/character'
 
@@ -174,6 +174,8 @@ const saves = computed(() => {
 async function adjustHp(delta) {
   try {
     await characterStore.adjustHp(characterId.value, delta)
+    // 强制重绘 - 解决 iOS Safari 渲染阻塞
+    forceUiUpdate()
     // 检测死亡
     if (character.value && character.value.currentHp <= 0) {
       showDeathModal.value = true
@@ -188,6 +190,8 @@ async function useResource(resource) {
   if (resource.currentValue <= 0) return
   try {
     await characterStore.updateResource(characterId.value, resource.id, -1)
+    // 强制重绘
+    forceUiUpdate()
   } catch (err) {
     console.error('Failed to use resource:', err)
   }
@@ -198,6 +202,8 @@ async function recoverResource(resource) {
   if (resource.currentValue >= resource.maxValue) return
   try {
     await characterStore.updateResource(characterId.value, resource.id, 1)
+    // 强制重绘
+    forceUiUpdate()
   } catch (err) {
     console.error('Failed to recover resource:', err)
   }
@@ -207,6 +213,8 @@ async function recoverResource(resource) {
 async function longRest() {
   try {
     await characterStore.longRest(characterId.value)
+    // 强制重绘
+    forceUiUpdate()
   } catch (err) {
     console.error('Failed to long rest:', err)
   }
@@ -232,6 +240,17 @@ const effectRefs = ref(new Map())
 const showDeathModal = ref(false)
 const isDying = ref(false)
 
+// 强制重绘变量 - 解决 iOS Safari 渲染阻塞
+const uiKey = ref(0)
+
+// 强制刷新 UI
+function forceUiUpdate() {
+  uiKey.value++
+  nextTick(() => {
+    console.log('🔄 [iOS] Force UI update, key:', uiKey.value)
+  })
+}
+
 function getEffectClass(resourceName) {
   const name = resourceName.toLowerCase()
   if (name.includes('圣疗') || name.includes('lay') || name.includes('heal')) return 'effect-holy'
@@ -242,22 +261,14 @@ function getEffectClass(resourceName) {
 }
 
 async function useResourceWithEffect(resource, event) {
-  console.log('🖱️ [CLICK] useResourceWithEffect called!')
-  console.log('🖱️ [CLICK] Resource:', resource.resourceName, 'current value:', resource.currentValue)
-
-  if (resource.currentValue <= 0) {
-    console.log('❌ [CLICK] Resource depleted, ignoring click')
-    return
-  }
+  if (resource.currentValue <= 0) return
 
   // 触发特效
   const button = event.currentTarget
-  console.log('🎯 [CLICK] Button element obtained:', button)
   triggerEffectOnButton(button, resource.resourceName)
 
   // 执行使用
   await useResource(resource)
-  console.log('✅ [CLICK] Resource updated via API')
 }
 
 function triggerEffectOnButton(button, resourceName) {
@@ -449,6 +460,8 @@ async function adjustLevel(delta) {
 
   try {
     await characterStore.updateCharacter(characterId.value, { level: newLevel })
+    // 强制重绘
+    forceUiUpdate()
   } catch (err) {
     console.error('Failed to adjust level:', err)
   }
@@ -463,6 +476,8 @@ async function adjustStat(statName, delta) {
 
   try {
     await characterStore.updateCharacter(characterId.value, { [statName]: newValue })
+    // 强制重绘
+    forceUiUpdate()
   } catch (err) {
     console.error('Failed to adjust stat:', err)
   }
@@ -555,7 +570,7 @@ onMounted(async () => {
                   </button>
                 </div>
               </div>
-              <div class="text-2xl text-center font-black mb-3" style="color: #f4e4bc;">
+              <div :key="uiKey" class="text-2xl text-center font-black mb-3" style="color: #f4e4bc;">
                 {{ character.currentHp }} <span style="color: #8b4513;" class="text-lg">/ {{ character.maxHp }}</span>
               </div>
               <div class="w-full rounded-full h-5 overflow-hidden" style="background: #4a3520; border: 2px solid #3a2510;">
@@ -643,10 +658,10 @@ onMounted(async () => {
               class="group parchment iron-border rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 cursor-default"
             >
               <div class="text-xs uppercase font-bold mb-1" style="color: #5d4025;">{{ stat.nameEn }}</div>
-              <div class="text-3xl font-black mb-1" style="color: #8b4513;">
+              <div :key="uiKey" class="text-3xl font-black mb-1" style="color: #8b4513;">
                 {{ stat.modifier }}
               </div>
-              <div class="text-xs mb-2" style="color: #5d4025;">({{ stat.name }} {{ stat.value }})</div>
+              <div :key="uiKey" class="text-xs mb-2" style="color: #5d4025;">({{ stat.name }} {{ stat.value }})</div>
               <div class="text-xs mb-2" style="color: #5d4025;">检定 {{ stat.modifier }}</div>
               <div class="flex gap-1 justify-center">
                 <button
@@ -679,7 +694,7 @@ onMounted(async () => {
                 >
                   −
                 </button>
-                <span class="text-2xl font-black" style="color: #8b4513;">Lv. {{ character.level }}</span>
+                <span :key="uiKey" class="text-2xl font-black" style="color: #8b4513;">Lv. {{ character.level }}</span>
                 <button
                   @click.prevent="adjustLevel(1)"
                   :disabled="character.level >= 20"
@@ -718,7 +733,7 @@ onMounted(async () => {
             >
               <div class="flex justify-between items-center mb-3">
                 <span class="font-bold parchment-text">{{ resource.resourceName }}</span>
-                <div class="flex items-center gap-2">
+                <div :key="uiKey" class="flex items-center gap-2">
                   <span class="text-sm" style="color: #5d4025;">{{ resource.currentValue }}</span>
                   <span class="text-sm" style="color: #8b4513;">/</span>
                   <span class="text-sm" style="color: #5d4025;">{{ resource.maxValue }}</span>
