@@ -50,6 +50,103 @@ const formattedInitiative = computed(() => {
   return character.value.initiative >= 0 ? `+${character.value.initiative}` : `${character.value.initiative}`
 })
 
+// 计算 BAB (基础攻击加值) - 简化版本，基于等级
+const bab = computed(() => {
+  if (!character.value) return 0
+  const level = character.value.level
+  // 根据职业类型计算 BAB（这里简化处理）
+  const dndClass = character.value.dndClass
+  if (dndClass === 'Paladin' || dndClass === 'Duskblade') {
+    // 高 BAB 职业：每级 +1
+    return level
+  } else if (dndClass === 'Bard') {
+    // 中 BAB 职业：每 2 级 +1（四舍五入）
+    return Math.floor(level * 0.75)
+  } else {
+    // 低 BAB 职业：每 2 级 +1
+    return Math.floor(level / 2)
+  }
+})
+
+// 攻击检定
+const attackRoll = computed(() => {
+  if (!character.value) return '+0'
+  const strMod = Math.floor((character.value.strength - 10) / 2)
+  const total = bab.value + strMod
+  return total >= 0 ? `+${total}` : `${total}`
+})
+
+// 强韧检定 (Fortitude Save) - 基于体质
+const fortitudeSave = computed(() => {
+  if (!character.value) return '+0'
+  const conMod = Math.floor((character.value.constitution - 10) / 2)
+  const level = character.value.level
+  // 强壮豁免奖励（简化：高豁免职业每级 +2，其他 +0.5）
+  const dndClass = character.value.dndClass
+  let baseSave = 0
+  if (dndClass === 'Paladin') {
+    baseSave = Math.floor(level * 0.7) // 高豁免
+  } else {
+    baseSave = Math.floor(level / 3) // 低豁免
+  }
+  const total = baseSave + conMod
+  return total >= 0 ? `+${total}` : `${total}`
+})
+
+// 反射检定 (Reflex Save) - 基于敏捷
+const reflexSave = computed(() => {
+  if (!character.value) return '+0'
+  const dexMod = Math.floor((character.value.dexterity - 10) / 2)
+  const level = character.value.level
+  const dndClass = character.value.dndClass
+  let baseSave = 0
+  if (dndClass === 'Duskblade') {
+    baseSave = Math.floor(level * 0.7) // 高豁免
+  } else {
+    baseSave = Math.floor(level / 3) // 低豁免
+  }
+  const total = baseSave + dexMod
+  return total >= 0 ? `+${total}` : `${total}`
+})
+
+// 意志检定 (Will Save) - 基于感知
+const willSave = computed(() => {
+  if (!character.value) return '+0'
+  const wisMod = Math.floor((character.value.wisdom - 10) / 2)
+  const level = character.value.level
+  const dndClass = character.value.dndClass
+  let baseSave = 0
+  if (dndClass === 'Bard' || dndClass === 'Warlock') {
+    baseSave = Math.floor(level * 0.7) // 高豁免
+  } else {
+    baseSave = Math.floor(level / 3) // 低豁免
+  }
+  const total = baseSave + wisMod
+  return total >= 0 ? `+${total}` : `${total}`
+})
+
+// 护甲等级计算
+const calculatedAC = computed(() => {
+  if (!character.value) return 10
+  const baseAC = 10
+  const dexMod = Math.floor((character.value.dexterity - 10) / 2)
+  // 简化：AC = 基础 + 盔甲 + 敏捷调整值
+  const total = baseAC + character.value.armorClass - 10 + dexMod
+  return total
+})
+
+// 检定列表数据
+const saves = computed(() => {
+  if (!character.value) return []
+  return [
+    { name: '攻击', nameEn: 'Attack', value: attackRoll.value, color: 'from-red-500 to-rose-600', icon: '⚔️' },
+    { name: '强韧', nameEn: 'Fortitude', value: fortitudeSave.value, color: 'from-orange-500 to-amber-600', icon: '💪' },
+    { name: '反射', nameEn: 'Reflex', value: reflexSave.value, color: 'from-green-500 to-emerald-600', icon: '⚡' },
+    { name: '意志', nameEn: 'Will', value: willSave.value, color: 'from-purple-500 to-violet-600', icon: '🧠' },
+    { name: '护甲', nameEn: 'AC', value: calculatedAC.value, color: 'from-blue-500 to-cyan-600', icon: '🛡️' }
+  ]
+})
+
 // HP 调整
 async function adjustHp(delta) {
   try {
@@ -235,7 +332,7 @@ onMounted(async () => {
             </div>
 
             <!-- 防御属性 -->
-            <div class="defense-grid grid grid-cols-3 gap-3 w-full">
+            <div class="defense-grid grid grid-cols-3 gap-3 w-full mb-6">
               <div class="bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-xl p-4 text-center border border-slate-600/30 backdrop-blur-sm">
                 <div class="text-2xl mb-1">🛡️</div>
                 <div class="text-xs text-gray-400 mb-1">护甲</div>
@@ -250,6 +347,34 @@ onMounted(async () => {
                 <div class="text-2xl mb-1">👟</div>
                 <div class="text-xs text-gray-400 mb-1">速度</div>
                 <div class="text-xl font-black text-green-400">{{ character.speed }} ft</div>
+              </div>
+            </div>
+
+            <!-- 检定列表 -->
+            <div class="saves-grid grid grid-cols-1 gap-3 w-full">
+              <div class="text-sm font-bold text-amber-400 mb-2 flex items-center gap-2">
+                <span>🎯</span>
+                <span>检定</span>
+              </div>
+              <div
+                v-for="save in saves"
+                :key="save.nameEn"
+                class="bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-xl p-3 border border-slate-600/30 backdrop-blur-sm"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xl">{{ save.icon }}</span>
+                    <div>
+                      <div class="text-xs text-gray-400 uppercase font-bold">{{ save.nameEn }}</div>
+                      <div class="text-sm text-white font-medium">{{ save.name }}</div>
+                    </div>
+                  </div>
+                  <div
+                    :class="['text-2xl font-black bg-gradient-to-r bg-clip-text text-transparent', save.color]"
+                  >
+                    {{ save.value }}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
