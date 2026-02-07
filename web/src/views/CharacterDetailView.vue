@@ -61,6 +61,16 @@ function getClassName(dndClass) {
   return names[dndClass] || dndClass
 }
 
+// 获取中文种族名
+function getRaceName(race) {
+  const names = {
+    'Human': '人类',
+    'Half-Elf': '半精灵',
+    'Half-Orc': '半兽人'
+  }
+  return names[race] || race
+}
+
 // 计算 BAB (基础攻击加值) - 简化版本，基于等级
 const bab = computed(() => {
   if (!character.value) return 0
@@ -531,7 +541,7 @@ onMounted(async () => {
               <span class="px-3 py-1 rounded-full text-sm font-bold shadow-md" style="background: linear-gradient(180deg, #5a5a5a 0%, #3a3a3a 100%); color: #f4e4bc; border: 2px solid #4a4a4a;">
                 {{ getClassName(character.dndClass) }}
               </span>
-              <span style="color: #c4a777;" class="text-sm">{{ character.race }}</span>
+              <span style="color: #c4a777;" class="text-sm">{{ getRaceName(character.race) }}</span>
             </div>
 
             <!-- HP 血条 -->
