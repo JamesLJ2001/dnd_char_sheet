@@ -26,6 +26,14 @@ public class DndCharacter {
     private Integer initiative;
     private Integer speed;
 
+    // 角色详细信息
+    private String gender;
+    private String alignment;
+    private String faith;
+    private Integer age;
+    private String height;
+    private String weight;
+
     // 六维属性
     private Integer strength;
     private Integer dexterity;
@@ -125,6 +133,24 @@ public class DndCharacter {
 
     public Integer getSpeed() { return speed; }
     public void setSpeed(Integer speed) { this.speed = speed; }
+
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
+
+    public String getAlignment() { return alignment; }
+    public void setAlignment(String alignment) { this.alignment = alignment; }
+
+    public String getFaith() { return faith; }
+    public void setFaith(String faith) { this.faith = faith; }
+
+    public Integer getAge() { return age; }
+    public void setAge(Integer age) { this.age = age; }
+
+    public String getHeight() { return height; }
+    public void setHeight(String height) { this.height = height; }
+
+    public String getWeight() { return weight; }
+    public void setWeight(String weight) { this.weight = weight; }
 
     public List<CharacterResource> getResources() { return resources; }
     public void setResources(List<CharacterResource> resources) { this.resources = resources; }

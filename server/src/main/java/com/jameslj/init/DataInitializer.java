@@ -24,7 +24,7 @@ public class DataInitializer implements CommandLineRunner {
         DndCharacter paladin = new DndCharacter();
         paladin.setId(1L);
         paladin.setName("瓦莱里安-奥理安");
-        paladin.setPlayerName("你");
+        paladin.setPlayerName("瓦莱里安-奥理安");
         paladin.setDndClass("Paladin");
         paladin.setRace("Human");
         paladin.setLevel(3);
@@ -41,6 +41,13 @@ public class DataInitializer implements CommandLineRunner {
         paladin.setIntelligence(10);
         paladin.setWisdom(13);
         paladin.setCharisma(15);
+        // 详细信息
+        paladin.setGender("男");
+        paladin.setAlignment("守序善良");
+        paladin.setFaith("提尔");
+        paladin.setAge(24);
+        paladin.setHeight("190cm");
+        paladin.setWeight("90kg");
 
         // Paladin 资源
         CharacterResource smiteEvil = new CharacterResource("Smite Evil (破邪斩)", 1, 1, "LONG_REST");
@@ -55,7 +62,7 @@ public class DataInitializer implements CommandLineRunner {
         DndCharacter duskblade = new DndCharacter();
         duskblade.setId(2L);
         duskblade.setName("维涅斯贝雅德");
-        duskblade.setPlayerName("朋友A");
+        duskblade.setPlayerName("维涅斯贝雅德");
         duskblade.setDndClass("Duskblade");
         duskblade.setRace("Half-Elf");
         duskblade.setLevel(3);
@@ -72,6 +79,13 @@ public class DataInitializer implements CommandLineRunner {
         duskblade.setIntelligence(16);
         duskblade.setWisdom(15);
         duskblade.setCharisma(11);
+        // 详细信息
+        duskblade.setGender("女");
+        duskblade.setAlignment("混乱中立");
+        duskblade.setFaith("莱拉");
+        duskblade.setAge(28);
+        duskblade.setHeight("174cm");
+        duskblade.setWeight("64kg");
 
         // Duskblade 资源
         CharacterResource arcaneAttunement = new CharacterResource("奥能同调 (Arcane Attunement)", 6, 6, "LONG_REST");
@@ -86,7 +100,7 @@ public class DataInitializer implements CommandLineRunner {
         DndCharacter warlock = new DndCharacter();
         warlock.setId(3L);
         warlock.setName("ame^^");
-        warlock.setPlayerName("朋友B");
+        warlock.setPlayerName("ame^^");
         warlock.setDndClass("Warlock");
         warlock.setRace("Half-Orc");
         warlock.setLevel(3);
@@ -103,6 +117,13 @@ public class DataInitializer implements CommandLineRunner {
         warlock.setIntelligence(10);
         warlock.setWisdom(10);
         warlock.setCharisma(16);
+        // 详细信息
+        warlock.setGender("女");
+        warlock.setAlignment("混乱邪恶");
+        warlock.setFaith("");
+        warlock.setAge(20);
+        warlock.setHeight("198cm");
+        warlock.setWeight("100kg");
 
         // Warlock 资源
         CharacterResource eldritchBlast = new CharacterResource("魔焰 (Eldritch Blast)", 999, 999, "NONE");
@@ -115,7 +136,7 @@ public class DataInitializer implements CommandLineRunner {
         DndCharacter bard = new DndCharacter();
         bard.setId(4L);
         bard.setName("葉月音音");
-        bard.setPlayerName("朋友C");
+        bard.setPlayerName("葉月音音");
         bard.setDndClass("Bard");
         bard.setRace("Human");
         bard.setLevel(3);
@@ -132,6 +153,13 @@ public class DataInitializer implements CommandLineRunner {
         bard.setIntelligence(16);
         bard.setWisdom(13);
         bard.setCharisma(17);
+        // 详细信息
+        bard.setGender("女");
+        bard.setAlignment("混乱善良");
+        bard.setFaith("圣爱音");
+        bard.setAge(18);
+        bard.setHeight("165cm");
+        bard.setWeight("保密");
 
         // Bard 资源
         CharacterResource bardicMusic = new CharacterResource("吟唱次数 (Bardic Music)", 3, 3, "LONG_REST");

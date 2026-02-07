@@ -60,10 +60,6 @@ function getHpBarColor(percentage) {
   if (percentage > 30) return 'linear-gradient(to right, #5a4a20, #3d3515)'
   return 'linear-gradient(to right, #5a2020, #3d1515)'
 }
-
-// 版本信息
-const appVersion = 'v2.0-iOS-fix-' + new Date().getTime()
-const buildTime = new Date().toLocaleString('zh-CN')
 </script>
 
 <template>
@@ -74,7 +70,7 @@ const buildTime = new Date().toLocaleString('zh-CN')
       <div class="text-center mb-16">
         <div class="inline-block iron-header px-12 py-6 mb-4" style="border: 4px solid #4a4a4a; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);">
           <h1 class="text-5xl font-black mb-2 font-gothic" style="color: #f4e4bc; text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 215, 0, 0.3);">
-            ⚔️ 角色大厅 ⚔️
+            ⚔️ 边境诸国 ⚔️
           </h1>
         </div>
         <p class="text-xl font-heavy font-heading" style="color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">选择你的英雄，开启史诗冒险</p>
@@ -115,31 +111,37 @@ const buildTime = new Date().toLocaleString('zh-CN')
             </div>
 
             <!-- 角色信息 -->
-            <h2 class="text-3xl font-black mb-2 text-center font-title" style="color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">
-              {{ character.name }}
+            <h2 class="text-2xl font-black mb-1 text-center font-title" style="color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">
+              {{ character.playerName || character.name }}
             </h2>
             <div class="text-center mb-4">
-              <span class="inline-block px-4 py-2 rounded text-sm font-bold" style="background: linear-gradient(180deg, #5a5a5a 0%, #3a3a3a 100%); color: #f4e4bc; border: 2px solid #4a4a4a;">
-                {{ getClassName(character.dndClass) }}
+              <span class="inline-block px-3 py-1 rounded text-xs font-bold" style="background: linear-gradient(180deg, #5a5a5a 0%, #3a3a3a 100%); color: #f4e4bc; border: 2px solid #4a4a4a;">
+                {{ character.race }} {{ getClassName(character.dndClass) }}
               </span>
-              <div class="mt-2 text-amber-400 font-bold text-lg">等级 {{ character.level }}</div>
             </div>
 
-            <!-- HP 进度条 -->
+            <!-- 详细信息 -->
             <div class="mb-4 flex-grow">
-              <div class="parchment p-3 rounded" style="border: 2px solid #5a4025;">
-                <div class="flex justify-between text-sm mb-2">
-                  <span class="font-bold parchment-text">生命值</span>
-                  <span class="font-black" style="color: #8b4513;">{{ character.currentHp }} / {{ character.maxHp }}</span>
+              <div class="parchment p-3 rounded text-sm space-y-1" style="border: 2px solid #5a4025;">
+                <div class="flex justify-between" style="color: #5d4025;">
+                  <span class="font-bold">性别</span>
+                  <span>{{ character.gender || '未知' }}</span>
                 </div>
-                <div class="w-full rounded-full h-4" style="background: #4a3520; border: 2px solid #3a2510;">
-                  <div
-                    :style="{
-                      width: getHpPercentage(character.currentHp, character.maxHp) + '%',
-                      background: getHpBarColor(getHpPercentage(character.currentHp, character.maxHp))
-                    }"
-                    class="h-full rounded-full transition-all duration-700"
-                  ></div>
+                <div class="flex justify-between" style="color: #5d4025;">
+                  <span class="font-bold">阵营</span>
+                  <span>{{ character.alignment || '未知' }}</span>
+                </div>
+                <div class="flex justify-between" style="color: #5d4025;">
+                  <span class="font-bold">信仰</span>
+                  <span class="text-right" style="max-width: 120px;">{{ character.faith || '无' }}</span>
+                </div>
+                <div class="flex justify-between" style="color: #5d4025;">
+                  <span class="font-bold">年龄</span>
+                  <span>{{ character.age || '?' }} 岁</span>
+                </div>
+                <div class="flex justify-between" style="color: #5d4025;">
+                  <span class="font-bold">身高/体重</span>
+                  <span>{{ character.height || '?' }} / {{ character.weight || '?' }}</span>
                 </div>
               </div>
             </div>
@@ -156,7 +158,7 @@ const buildTime = new Date().toLocaleString('zh-CN')
 
       <!-- 底部装饰 -->
       <div class="text-center mt-16 mb-8">
-        <p class="text-lg font-heading font-bold" style="color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">🎲 Dungeons & Dragons 角色表 v2.0</p>
+        <p class="text-lg font-heading font-bold" style="color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">⚔️ 边境诸国 - 角色表 v2.0</p>
         <p class="text-sm mt-2 font-body" style="color: #c4a777;">中世纪复古风格</p>
         <!-- 调试信息 -->
         <div class="mt-4 p-3 rounded text-xs" style="background: rgba(0, 0, 0, 0.5); border: 1px solid #4a4a4a;">
