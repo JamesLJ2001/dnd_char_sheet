@@ -181,7 +181,6 @@ async function adjustHp(delta) {
       showDeathModal.value = true
     }
   } catch (err) {
-    console.error('Failed to adjust HP:', err)
   }
 }
 
@@ -193,7 +192,6 @@ async function useResource(resource) {
     // 强制重绘
     forceUiUpdate()
   } catch (err) {
-    console.error('Failed to use resource:', err)
   }
 }
 
@@ -205,7 +203,6 @@ async function recoverResource(resource) {
     // 强制重绘
     forceUiUpdate()
   } catch (err) {
-    console.error('Failed to recover resource:', err)
   }
 }
 
@@ -216,7 +213,6 @@ async function longRest() {
     // 强制重绘
     forceUiUpdate()
   } catch (err) {
-    console.error('Failed to long rest:', err)
   }
 }
 
@@ -246,9 +242,6 @@ const uiKey = ref(0)
 // 强制刷新 UI
 function forceUiUpdate() {
   uiKey.value++
-  nextTick(() => {
-    console.log('🔄 [iOS] Force UI update, key:', uiKey.value)
-  })
 }
 
 function getEffectClass(resourceName) {
@@ -272,13 +265,11 @@ async function useResourceWithEffect(resource, event) {
 }
 
 function triggerEffectOnButton(button, resourceName) {
-  console.log('🎨 [EFFECT] Fullscreen effect triggered for resource:', resourceName)
 
   // 获取按钮位置作为特效中心点
   const rect = button.getBoundingClientRect()
   const centerX = rect.left + rect.width / 2
   const centerY = rect.top + rect.height / 2
-  console.log('📐 [EFFECT] Effect center - X:', centerX, 'Y:', centerY)
 
   // 创建全屏特效容器
   const container = document.createElement('div')
@@ -293,11 +284,9 @@ function triggerEffectOnButton(button, resourceName) {
     overflow: visible;
   `
   document.body.appendChild(container)
-  console.log('✅ [EFFECT] Fullscreen container created')
 
   // 根据资源名称确定颜色
   const effectClass = getEffectClass(resourceName)
-  console.log('🏷️ [EFFECT] Effect class:', effectClass)
 
   const colors = {
     'effect-holy': { primary: '#ffd700', secondary: '#ffec8b', glow: 'rgba(255, 215, 0, 0.8)' },
@@ -307,7 +296,6 @@ function triggerEffectOnButton(button, resourceName) {
     'effect-magic': { primary: '#60a5fa', secondary: '#3b82f6', glow: 'rgba(96, 165, 250, 0.8)' }
   }
   const color = colors[effectClass] || colors['effect-magic']
-  console.log('🎨 [EFFECT] Color scheme:', color)
 
   // 创建多个震撼的光环效果（从按钮位置扩散）
   for (let ring = 0; ring < 3; ring++) {
@@ -326,10 +314,8 @@ function triggerEffectOnButton(button, resourceName) {
     `
     container.appendChild(ripple)
   }
-  console.log('✅ [EFFECT] 3 shockwave ripples created')
 
   // 创建大量粒子（100个）从按钮爆发到全屏
-  console.log('🎆 [EFFECT] Creating 100 explosion particles...')
   for (let i = 0; i < 100; i++) {
     const particle = document.createElement('div')
     const angle = (Math.PI * 2 * i) / 100
@@ -360,10 +346,8 @@ function triggerEffectOnButton(button, resourceName) {
       particle.remove()
     }, (delay + duration) * 1000)
   }
-  console.log('✅ [EFFECT] 100 particles created')
 
   // 添加额外的闪光粒子（50个）
-  console.log('✨ [EFFECT] Creating 50 sparkle particles...')
   for (let i = 0; i < 50; i++) {
     const sparkle = document.createElement('div')
     const angle = Math.random() * Math.PI * 2
@@ -394,7 +378,6 @@ function triggerEffectOnButton(button, resourceName) {
       sparkle.remove()
     }, (delay + duration) * 1000)
   }
-  console.log('✅ [EFFECT] 50 sparkles created')
 
   // 添加动画关键帧
   const existingStyle = document.getElementById('effect-animations')
@@ -440,15 +423,12 @@ function triggerEffectOnButton(button, resourceName) {
       }
     `
     document.head.appendChild(style)
-    console.log('✅ [EFFECT] Fullscreen animation keyframes injected')
   } else {
-    console.log('♻️ [EFFECT] Animation keyframes already exist, skipping injection')
   }
 
   // 清理容器（延长时间让全屏特效播放完整）
   setTimeout(() => {
     container.remove()
-    console.log('🗑️ [EFFECT] Fullscreen container cleaned up')
   }, 3000)
 }
 
@@ -463,7 +443,6 @@ async function adjustLevel(delta) {
     // 强制重绘
     forceUiUpdate()
   } catch (err) {
-    console.error('Failed to adjust level:', err)
   }
 }
 
@@ -479,7 +458,6 @@ async function adjustStat(statName, delta) {
     // 强制重绘
     forceUiUpdate()
   } catch (err) {
-    console.error('Failed to adjust stat:', err)
   }
 }
 

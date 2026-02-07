@@ -25,7 +25,6 @@ export const useCharacterStore = defineStore('character', () => {
       characters.value = response.data
     } catch (err) {
       error.value = err.message
-      console.error('Failed to fetch characters:', err)
     } finally {
       loading.value = false
     }
@@ -43,11 +42,9 @@ export const useCharacterStore = defineStore('character', () => {
       const index = characters.value.findIndex(char => char.id === id)
       if (index !== -1) {
         characters.value[index] = response.data
-        console.log('✅ [Store] Updated character:', response.data.name, response.data)
       }
       return response.data
     } catch (err) {
-      console.error('❌ [Store] Failed to update character:', err)
       throw err
     }
   }
@@ -64,11 +61,9 @@ export const useCharacterStore = defineStore('character', () => {
       const index = characters.value.findIndex(char => char.id === charId)
       if (index !== -1) {
         characters.value[index] = response.data
-        console.log('✅ [Store] HP adjusted:', response.data.currentHp, '/', response.data.maxHp)
       }
       return response.data
     } catch (err) {
-      console.error('❌ [Store] Failed to adjust HP:', err)
       throw err
     }
   }
@@ -85,11 +80,9 @@ export const useCharacterStore = defineStore('character', () => {
       const index = characters.value.findIndex(char => char.id === charId)
       if (index !== -1) {
         characters.value[index] = response.data
-        console.log('✅ [Store] Resource updated')
       }
       return response.data
     } catch (err) {
-      console.error('❌ [Store] Failed to update resource:', err)
       throw err
     }
   }
@@ -106,11 +99,9 @@ export const useCharacterStore = defineStore('character', () => {
       const index = characters.value.findIndex(char => char.id === charId)
       if (index !== -1) {
         characters.value[index] = response.data
-        console.log('✅ [Store] Long rest completed')
       }
       return response.data
     } catch (err) {
-      console.error('❌ [Store] Failed to long rest:', err)
       throw err
     }
   }
