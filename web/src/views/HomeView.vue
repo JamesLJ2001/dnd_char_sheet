@@ -147,7 +147,7 @@ function getHpBarColor(percentage) {
             <div class="flex justify-between items-center text-sm border-t-2 pt-4" style="border-color: #5a4025;">
               <div class="flex items-center gap-2">
                 <span style="font-size: 1.5rem;">🛡️</span>
-                <span class="font-bold parchment-text" style="font-size: 1.1rem;">护甲 {{ character.armorClass }}</span>
+                <span class="font-bold" style="font-size: 1.1rem; color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">护甲 {{ character.armorClass }}</span>
               </div>
               <div class="font-bold metal-shine">
                 查看详情 →
