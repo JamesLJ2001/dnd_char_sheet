@@ -243,23 +243,24 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-4 md:p-6 relative overflow-hidden">
+  <div class="min-h-screen p-4 md:p-6 relative overflow-hidden" style="background: linear-gradient(to bottom right, #020617, #0f172a, #1e1b4b);">
+
     <!-- 多层背景装饰 -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
       <!-- 大型渐变光晕 -->
-      <div class="absolute top-0 left-0 w-[600px] h-[600px] bg-amber-600/10 rounded-full blur-[120px] animate-pulse"></div>
-      <div class="absolute bottom-0 right-0 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[120px] animate-pulse" style="animation-delay: 1s;"></div>
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-600/5 rounded-full blur-[150px]"></div>
+      <div class="absolute top-0 left-0 w-[600px] h-[600px] rounded-full blur-[120px] animate-pulse" style="background: rgba(217, 119, 6, 0.1);"></div>
+      <div class="absolute bottom-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] animate-pulse" style="background: rgba(147, 51, 234, 0.1); animation-delay: 1s;"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full blur-[150px]" style="background: rgba(79, 70, 229, 0.05);"></div>
 
       <!-- 中型光斑 -->
-      <div class="absolute top-1/4 right-1/4 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl"></div>
-      <div class="absolute bottom-1/3 left-1/4 w-72 h-72 bg-rose-500/10 rounded-full blur-3xl"></div>
+      <div class="absolute top-1/4 right-1/4 w-64 h-64 rounded-full blur-3xl" style="background: rgba(6, 182, 212, 0.1);"></div>
+      <div class="absolute bottom-1/3 left-1/4 w-72 h-72 rounded-full blur-3xl" style="background: rgba(244, 63, 94, 0.1);"></div>
 
       <!-- 网格纹理 -->
-      <div class="absolute inset-0 opacity-[0.02]" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 50px 50px;"></div>
+      <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 50px 50px; opacity: 0.02;"></div>
 
       <!-- 扫描线效果 -->
-      <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/20 to-transparent opacity-30"></div>
+      <div class="absolute inset-0" style="background: linear-gradient(to bottom, transparent, rgba(15, 23, 42, 0.2), transparent); opacity: 0.3;"></div>
     </div>
 
     <div class="relative max-w-7xl mx-auto">
