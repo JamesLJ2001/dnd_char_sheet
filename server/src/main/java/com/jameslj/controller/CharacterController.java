@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/characters")
@@ -72,15 +73,17 @@ public class CharacterController {
             return ResponseEntity.badRequest().build();
         }
 
-        return characterRepository.findById(id)
-                .map(character -> {
-                    int newHp = character.getCurrentHp() + delta;
-                    newHp = Math.max(0, Math.min(newHp, character.getMaxHp()));
-                    character.setCurrentHp(newHp);
-                    DndCharacter updated = characterRepository.save(character);
-                    return ResponseEntity.ok(updated);
-                })
-                .orElse(ResponseEntity.notFound().build());
+        Optional<DndCharacter> optCharacter = characterRepository.findById(id);
+        if (optCharacter.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        DndCharacter character = optCharacter.get();
+        int newHp = character.getCurrentHp() + delta;
+        newHp = Math.max(0, Math.min(newHp, character.getMaxHp()));
+        character.setCurrentHp(newHp);
+        DndCharacter updated = characterRepository.save(character);
+        return ResponseEntity.ok(updated);
     }
 
     // PATCH /api/characters/{id}/resources/{resourceId} - 调整资源值
@@ -95,25 +98,27 @@ public class CharacterController {
             return ResponseEntity.badRequest().build();
         }
 
-        return characterRepository.findById(id)
-                .map(character -> {
-                    CharacterResource resource = character.getResources().stream()
-                            .filter(r -> r.getId().equals(resourceId))
-                            .findFirst()
-                            .orElse(null);
+        Optional<DndCharacter> optCharacter = characterRepository.findById(id);
+        if (optCharacter.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
 
-                    if (resource == null) {
-                        return ResponseEntity.<DndCharacter>notFound().build();
-                    }
+        DndCharacter character = optCharacter.get();
+        CharacterResource resource = character.getResources().stream()
+                .filter(r -> r.getId().equals(resourceId))
+                .findFirst()
+                .orElse(null);
 
-                    int newValue = resource.getCurrentValue() + delta;
-                    newValue = Math.max(0, Math.min(newValue, resource.getMaxValue()));
-                    resource.setCurrentValue(newValue);
+        if (resource == null) {
+            return ResponseEntity.notFound().build();
+        }
 
-                    DndCharacter updated = characterRepository.save(character);
-                    return ResponseEntity.ok(updated);
-                })
-                .orElse(ResponseEntity.notFound().build());
+        int newValue = resource.getCurrentValue() + delta;
+        newValue = Math.max(0, Math.min(newValue, resource.getMaxValue()));
+        resource.setCurrentValue(newValue);
+
+        DndCharacter updated = characterRepository.save(character);
+        return ResponseEntity.ok(updated);
     }
 
     // POST /api/characters/{id}/long-rest - 执行长休
