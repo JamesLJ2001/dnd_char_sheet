@@ -60,6 +60,10 @@ function getHpBarColor(percentage) {
   if (percentage > 30) return 'linear-gradient(to right, #5a4a20, #3d3515)'
   return 'linear-gradient(to right, #5a2020, #3d1515)'
 }
+
+// 版本信息
+const appVersion = 'v2.0-iOS-fix-' + new Date().getTime()
+const buildTime = new Date().toLocaleString('zh-CN')
 </script>
 
 <template>
@@ -154,6 +158,11 @@ function getHpBarColor(percentage) {
       <div class="text-center mt-16">
         <p class="text-lg font-heading font-bold" style="color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">🎲 Dungeons & Dragons 角色表 v2.0</p>
         <p class="text-sm mt-2 font-body" style="color: #c4a777;">中世纪复古风格</p>
+        <!-- 调试信息 -->
+        <div class="mt-4 p-3 rounded text-xs" style="background: rgba(0, 0, 0, 0.5); border: 1px solid #4a4a4a;">
+          <p style="color: #f4e4bc;">版本: {{ appVersion }}</p>
+          <p style="color: #c4a777;">构建时间: {{ buildTime }}</p>
+        </div>
       </div>
     </div>
   </div>
