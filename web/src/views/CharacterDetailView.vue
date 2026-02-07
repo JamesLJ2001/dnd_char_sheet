@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCharacterStore } from '../stores/character'
 
@@ -10,8 +10,26 @@ const characterStore = useCharacterStore()
 const characterId = computed(() => parseInt(route.params.id))
 const loading = ref(true)
 
-// 使用 computed 确保 iOS Safari 上的响应式更新
-const character = computed(() => characterStore.getCharacterById(characterId.value))
+// iOS Safari 修复：使用 watchEffect + ref 强制触发响应式更新
+const character = ref(null)
+const refreshKey = ref(0)
+
+// 监听 store 变化并强制更新
+watchEffect(() => {
+  const char = characterStore.getCharacterById(characterId.value)
+  if (char) {
+    // 创建新对象引用，强制 iOS Safari 识别变化
+    character.value = { ...char, _forceUpdate: refreshKey.value }
+  }
+})
+
+// 强制刷新函数
+function forceRefresh() {
+  refreshKey.value++
+  nextTick(() => {
+    console.log('🔄 [iOS] Forced refresh, character:', character.value)
+  })
+}
 
 // 六维属性数据
 const stats = computed(() => {
@@ -173,8 +191,10 @@ const saves = computed(() => {
 // HP 调整
 async function adjustHp(delta) {
   try {
+    console.log('📱 [iOS] adjustHp called, delta:', delta)
     await characterStore.adjustHp(characterId.value, delta)
-    // 使用 nextTick 确保 iOS Safari 触发响应式更新
+    // iOS Safari: 强制刷新
+    forceRefresh()
     await nextTick()
 
     // 检测死亡
@@ -190,8 +210,11 @@ async function adjustHp(delta) {
 async function useResource(resource) {
   if (resource.currentValue <= 0) return
   try {
+    console.log('📱 [iOS] useResource called, resource:', resource.resourceName)
     await characterStore.updateResource(characterId.value, resource.id, -1)
-    await nextTick() // 确保 iOS Safari 触发响应式更新
+    // iOS Safari: 强制刷新
+    forceRefresh()
+    await nextTick()
   } catch (err) {
     console.error('Failed to use resource:', err)
   }
@@ -201,8 +224,11 @@ async function useResource(resource) {
 async function recoverResource(resource) {
   if (resource.currentValue >= resource.maxValue) return
   try {
+    console.log('📱 [iOS] recoverResource called, resource:', resource.resourceName)
     await characterStore.updateResource(characterId.value, resource.id, 1)
-    await nextTick() // 确保 iOS Safari 触发响应式更新
+    // iOS Safari: 强制刷新
+    forceRefresh()
+    await nextTick()
   } catch (err) {
     console.error('Failed to recover resource:', err)
   }
@@ -211,8 +237,11 @@ async function recoverResource(resource) {
 // 长休
 async function longRest() {
   try {
+    console.log('📱 [iOS] longRest called')
     await characterStore.longRest(characterId.value)
-    await nextTick() // 确保 iOS Safari 触发响应式更新
+    // iOS Safari: 强制刷新
+    forceRefresh()
+    await nextTick()
   } catch (err) {
     console.error('Failed to long rest:', err)
   }
@@ -513,8 +542,11 @@ async function adjustLevel(delta) {
   if (newLevel < 1 || newLevel > 20) return
 
   try {
+    console.log('📱 [iOS] adjustLevel called, newLevel:', newLevel)
     await characterStore.updateCharacter(characterId.value, { level: newLevel })
-    await nextTick() // 确保 iOS Safari 触发响应式更新
+    // iOS Safari: 强制刷新
+    forceRefresh()
+    await nextTick()
   } catch (err) {
     console.error('Failed to adjust level:', err)
   }
@@ -528,8 +560,11 @@ async function adjustStat(statName, delta) {
   if (newValue < 1 || newValue > 30) return
 
   try {
+    console.log('📱 [iOS] adjustStat called, stat:', statName, 'newValue:', newValue)
     await characterStore.updateCharacter(characterId.value, { [statName]: newValue })
-    await nextTick() // 确保 iOS Safari 触发响应式更新
+    // iOS Safari: 强制刷新
+    forceRefresh()
+    await nextTick()
   } catch (err) {
     console.error('Failed to adjust stat:', err)
   }
