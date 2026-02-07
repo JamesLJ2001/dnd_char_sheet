@@ -244,12 +244,6 @@ let touchTimer = null
 
 // 通用的触摸/点击处理函数（带防抖）
 async function handleTouchOrClick(handler, event, ...args) {
-  // 阻止默认行为和事件冒泡
-  if (event) {
-    event.preventDefault()
-    event.stopPropagation()
-  }
-
   // 如果在触摸锁定期，忽略click事件（防止重复执行）
   if (touchLock.value) {
     console.log('🔒 [TOUCH] Locked, ignoring duplicate click')
