@@ -23,7 +23,8 @@ export const useCharacterStore = defineStore('character', () => {
 
   async function updateCharacter(id, payload) {
     try {
-      const response = await axios.put(`/api/characters/${id}`, payload);      // 更新本地状态
+      const response = await axios.put(`/api/characters/${id}`, payload)
+      // 更新本地状态
       const index = characters.value.findIndex(char => char.id === id)
       if (index !== -1) {
         characters.value[index] = { ...characters.value[index], ...response.data }
@@ -35,11 +36,64 @@ export const useCharacterStore = defineStore('character', () => {
     }
   }
 
+  async function adjustHp(charId, delta) {
+    try {
+      const response = await axios.patch(`/api/characters/${charId}/hp`, { delta })
+      // 更新本地状态
+      const index = characters.value.findIndex(char => char.id === charId)
+      if (index !== -1) {
+        characters.value[index] = { ...characters.value[index], ...response.data }
+      }
+      return response.data
+    } catch (err) {
+      console.error('Failed to adjust HP:', err)
+      throw err
+    }
+  }
+
+  async function updateResource(charId, resId, delta) {
+    try {
+      const response = await axios.patch(`/api/characters/${charId}/resources/${resId}`, { delta })
+      // 更新本地状态
+      const index = characters.value.findIndex(char => char.id === charId)
+      if (index !== -1) {
+        characters.value[index] = { ...characters.value[index], ...response.data }
+      }
+      return response.data
+    } catch (err) {
+      console.error('Failed to update resource:', err)
+      throw err
+    }
+  }
+
+  async function longRest(charId) {
+    try {
+      const response = await axios.post(`/api/characters/${charId}/long-rest`)
+      // 更新本地状态
+      const index = characters.value.findIndex(char => char.id === charId)
+      if (index !== -1) {
+        characters.value[index] = { ...characters.value[index], ...response.data }
+      }
+      return response.data
+    } catch (err) {
+      console.error('Failed to long rest:', err)
+      throw err
+    }
+  }
+
+  function getCharacterById(id) {
+    return characters.value.find(char => char.id === id)
+  }
+
   return {
     characters,
     loading,
     error,
     fetchCharacters,
-    updateCharacter
+    updateCharacter,
+    adjustHp,
+    updateResource,
+    longRest,
+    getCharacterById
   }
 })
