@@ -50,6 +50,17 @@ const formattedInitiative = computed(() => {
   return character.value.initiative >= 0 ? `+${character.value.initiative}` : `${character.value.initiative}`
 })
 
+// 获取中文职业名
+function getClassName(dndClass) {
+  const names = {
+    'Paladin': '圣武士',
+    'Duskblade': '暮刃',
+    'Warlock': '邪术师',
+    'Bard': '吟游诗人'
+  }
+  return names[dndClass] || dndClass
+}
+
 // 计算 BAB (基础攻击加值) - 简化版本，基于等级
 const bab = computed(() => {
   if (!character.value) return 0
@@ -518,7 +529,7 @@ onMounted(async () => {
             <h2 class="text-3xl font-black mb-1 font-title" style="color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">{{ character.name }}</h2>
             <div class="flex items-center gap-2 mb-6">
               <span class="px-3 py-1 rounded-full text-sm font-bold shadow-md" style="background: linear-gradient(180deg, #5a5a5a 0%, #3a3a3a 100%); color: #f4e4bc; border: 2px solid #4a4a4a;">
-                {{ character.dndClass }}
+                {{ getClassName(character.dndClass) }}
               </span>
               <span style="color: #c4a777;" class="text-sm">{{ character.race }}</span>
             </div>
