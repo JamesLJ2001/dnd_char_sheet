@@ -146,6 +146,11 @@
   color: #f4e4bc;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   transition: all 0.2s ease;
+  /* iOS Safari 触摸优化 */
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 .wood-button:hover {
@@ -224,4 +229,29 @@ body {
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
+}
+
+/* ========== 移动端触摸优化 ========== */
+
+/* 确保所有按钮在 iOS Safari 上正确响应 */
+button, .btn, [role="button"], a {
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 修复 iOS Safari 上的点击延迟 */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 确保可交互元素可以被点击 */
+input, button, select, textarea, a, [onclick] {
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+/* 禁用双击缩放，只保留必要的触摸手势 */
+button, a {
+  touch-action: manipulation;
 }
