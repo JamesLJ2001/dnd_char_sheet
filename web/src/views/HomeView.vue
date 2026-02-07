@@ -47,11 +47,23 @@ function getHpColor(percentage) {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-8">
-    <!-- 背景装饰 -->
+  <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-8 relative overflow-hidden">
+    <!-- 多层背景装饰 -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
-      <div class="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl"></div>
-      <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+      <!-- 大型渐变光晕 -->
+      <div class="absolute top-0 left-0 w-[600px] h-[600px] bg-amber-600/10 rounded-full blur-[120px] animate-pulse"></div>
+      <div class="absolute bottom-0 right-0 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[120px] animate-pulse" style="animation-delay: 1s;"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-600/5 rounded-full blur-[150px]"></div>
+
+      <!-- 中型光斑 -->
+      <div class="absolute top-1/4 right-1/4 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-1/3 left-1/4 w-72 h-72 bg-rose-500/10 rounded-full blur-3xl"></div>
+
+      <!-- 网格纹理 -->
+      <div class="absolute inset-0 opacity-[0.02]" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 50px 50px;"></div>
+
+      <!-- 扫描线效果 -->
+      <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/20 to-transparent opacity-30"></div>
     </div>
 
     <div class="relative max-w-7xl mx-auto">
