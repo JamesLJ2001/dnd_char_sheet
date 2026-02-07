@@ -1,1 +1,13 @@
-body { margin: 0; padding: 0; background: #181818; }
+@import "tailwindcss";
+@import "./medieval-theme.css";
+
+@theme {
+  --color-slate-950: #020617;
+  --color-slate-900: #0f172a;
+  --color-indigo-950: #1e1b4b;
+  --color-amber-600: #d97706;
+  --color-purple-600: #9333ea;
+  --color-cyan-500: #06b6d4;
+  --color-rose-500: #f43f5e;
+}
+

@@ -1,0 +1,289 @@
+/* 中世纪复古主题 - Medieval Theme */
+
+/* ========== 中世纪奇幻字体 ========== */
+
+/* 主标题字体 */
+.font-title {
+  font-family: 'Cinzel', 'Noto Serif SC', serif;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* 大标题字体 */
+.font-heading {
+  font-family: 'MedievalSharp', 'ZCOOL XiaoWei', cursive;
+}
+
+/* 哥特式装饰字体 */
+.font-gothic {
+  font-family: 'UnifrakturMaguntia', 'Ma Shan Zheng', cursive;
+}
+
+/* 正文优雅字体 */
+.font-body {
+  font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+}
+
+/* 活泼字体 */
+.font-playful {
+  font-family: 'ZCOOL KuaiLe', cursive;
+}
+
+/* 粗体标题 */
+.font-heavy {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 900;
+}
+
+/* 木纹纹理 */
+.wood-texture {
+  background-color: #3d2914;
+  background-image: url('/images/wood-texture.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* 铁栅栏边框 */
+.iron-border {
+  border: 4px solid #4a4a4a;
+  border-image: url('/images/iron-border.jpg') 30 round;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* 铁铆钉装饰 */
+.iron-rivet {
+  position: relative;
+}
+
+.iron-rivet::before,
+.iron-rivet::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle at 30% 30%, #8b8b8b, #3a3a3a);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.5),
+    0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.iron-rivet::before {
+  top: 4px;
+  left: 4px;
+}
+
+.iron-rivet::after {
+  top: 4px;
+  right: 4px;
+}
+
+/* 羊皮纸背景 */
+.parchment {
+  background: #f4e4bc;
+  background-image: url('/images/parchment-texture.jpg');
+  background-size: cover;
+  background-position: center;
+  box-shadow:
+    inset 0 0 50px rgba(139, 90, 43, 0.2),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+/* 铁艺标题栏 */
+.iron-header {
+  background: linear-gradient(180deg, #5a5a5a 0%, #3a3a3a 50%, #2a2a2a 100%);
+  border: 3px solid #4a4a4a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* 铁栅栏背景图案 */
+.iron-grid {
+  background-image:
+    linear-gradient(90deg, rgba(74, 74, 74, 0.3) 1px, transparent 1px),
+    linear-gradient(rgba(74, 74, 74, 0.3) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* 铁锁链装饰 */
+.chain-link {
+  position: relative;
+  overflow: hidden;
+}
+
+.chain-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    #5a5a5a 0px,
+    #5a5a5a 10px,
+    transparent 10px,
+    transparent 20px
+  );
+  opacity: 0.3;
+}
+
+/* 木质按钮 - 基础样式 */
+.wood-button {
+  background: linear-gradient(180deg, #5d4025 0%, #3d2914 50%, #2d1f0f 100%);
+  border: 3px solid #4a3520;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+  color: #f4e4bc;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  transition: background 0.1s ease, box-shadow 0.1s ease, transform 0.1s ease;
+  /* iOS Safari 触摸优化 */
+  cursor: pointer;
+  touch-action: manipulation;
+  /* 🔴 关键修改 1: 将高亮色设为透明，去掉白色的点击蒙版 */
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+}
+
+/* 🔴 关键修改 2: 只在支持鼠标悬停的设备上启用 hover 样式 */
+/* 这能完美解决 iOS 上“点一下变白且卡住”的问题 */
+@media (hover: hover) {
+  .wood-button:hover {
+    background: linear-gradient(180deg, #6d5035 0%, #4d3924 50%, #3d2f1f 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.15),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+      0 3px 6px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* 🔴 Active 样式保持不变，确保点击时有按压反馈 */
+.wood-button:active {
+  background: linear-gradient(180deg, #7a6045 0%, #5a4530 50%, #4a3520 100%) !important;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.3) !important;
+  transform: scale(0.98);
+}
+
+/* 金属光泽 */
+.metal-shine {
+  background: linear-gradient(135deg, #8b8b8b 0%, #e0e0e0 25%, #8b8b8b 50%, #a0a0a0 75%, #6b6b6b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+}
+
+/* 铁锈色文字 */
+.rust-text {
+  color: #8b4513;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.2),
+    0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* 旧纸文字 */
+.parchment-text {
+  color: #3d2914;
+  text-shadow: 0 1px 0 rgba(244, 228, 188, 0.3);
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #3d2914;
+  border: 2px solid #4a3520;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #5a5a5a 0%, #3a3a3a 100%);
+  border: 2px solid #4a4a4a;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #6a6a6a 0%, #4a4a4a 100%);
+}
+
+/* 全局背景 */
+body {
+  background-color: #1a1a1a;
+  background-image: url('/images/dungeon-wall.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+}
+
+.dungeon-bg {
+  background-color: #1a1a1a;
+  background-image: url('/images/dungeon-wall.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+}
+
+/* ========== 移动端触摸优化 ========== */
+
+/* 确保所有按钮在 iOS Safari 上正确响应 */
+button, .btn, [role="button"], a {
+  cursor: pointer;
+  touch-action: manipulation;
+  /* 🔴 统一修改：移除 iOS 默认的点击高亮（那层白膜） */
+  -webkit-tap-highlight-color: transparent;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+input, button, select, textarea, a, [onclick] {
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+button, a {
+  touch-action: manipulation;
+}
+
+/* ========== 强制修复 iOS 按钮粘滞 ========== */
+
+/* 1. 移除点击高亮 (那层白膜) */
+* {
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* 2. 禁止按钮获取焦点时的默认轮廓 */
+button:focus {
+  outline: none !important;
+}
+
+/* 3. 关键：只允许"鼠标悬停"设备显示 hover 颜色 */
+/* 手机上没有 hover，这能防止手指离开后颜色卡住 */
+@media (hover: hover) {
+  .wood-button:hover {
+    background: linear-gradient(180deg, #6d5035 0%, #4d3924 50%, #3d2f1f 100%);
+  }
+}
+
+/* 4. 手机端只在"按下瞬间"变色，手指一松立刻恢复 */
+.wood-button:active {
+  background: linear-gradient(180deg, #2d1f0f 0%, #3d2914 100%) !important;
+  transform: scale(0.95);
+}

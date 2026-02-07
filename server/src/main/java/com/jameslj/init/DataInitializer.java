@@ -1,5 +1,6 @@
 package com.jameslj.init;
 
+import com.jameslj.entity.CharacterResource;
 import com.jameslj.entity.DndCharacter;
 import com.jameslj.repository.CharacterRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -16,84 +17,171 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // 检查数据库是否为空
-        if (characterRepository.count() == 0) {
-            // 1. 战士 (高力量、高体质，高血量、高护甲)
-            DndCharacter warrior = new DndCharacter();
-            warrior.setId(1L);
-            warrior.setName("雷加");
-            warrior.setPlayerName("你");
-            warrior.setDndClass("战士");
-            warrior.setLevel(3);
-            warrior.setMaxHp(45);
-            warrior.setCurrentHp(45);
-            warrior.setArmorClass(16);
-            warrior.setStrength(16);
-            warrior.setDexterity(12);
-            warrior.setConstitution(16);
-            warrior.setIntelligence(10);
-            warrior.setWisdom(12);
-            warrior.setCharisma(10);
+        // 清除旧数据
+        characterRepository.deleteAll();
 
-            // 2. 法师 (高智力，低血量，低护甲)
-            DndCharacter mage = new DndCharacter();
-            mage.setId(2L);
-            mage.setName("艾拉");
-            mage.setPlayerName("朋友A");
-            mage.setDndClass("法师");
-            mage.setLevel(3);
-            mage.setMaxHp(20);
-            mage.setCurrentHp(20);
-            mage.setArmorClass(12);
-            mage.setStrength(8);
-            mage.setDexterity(14);
-            mage.setConstitution(12);
-            mage.setIntelligence(18);
-            mage.setWisdom(14);
-            mage.setCharisma(10);
+        // ==================== 角色 1: 瓦莱里安-奥理安 (Paladin) ====================
+        DndCharacter paladin = new DndCharacter();
+        paladin.setId(1L);
+        paladin.setName("瓦莱里安-奥理安");
+        paladin.setPlayerName("瓦莱里安-奥理安");
+        paladin.setDndClass("Paladin");
+        paladin.setRace("Human");
+        paladin.setLevel(3);
+        paladin.setMaxHp(33);
+        paladin.setCurrentHp(33);
+        paladin.setArmorClass(19);
+        paladin.setImageUrl("/images/paladin.jpg");
+        paladin.setMainWeapon("+1 锋锐寒铁长剑 (+8 to hit, 1d8+4 damage)");
+        paladin.setInitiative(4);
+        paladin.setSpeed(20);
+        paladin.setStrength(16);
+        paladin.setDexterity(10);
+        paladin.setConstitution(12);
+        paladin.setIntelligence(10);
+        paladin.setWisdom(13);
+        paladin.setCharisma(15);
+        // 详细信息
+        paladin.setGender("男");
+        paladin.setAlignment("守序善良");
+        paladin.setFaith("提尔");
+        paladin.setAge(24);
+        paladin.setHeight("190cm");
+        paladin.setWeight("90kg");
 
-            // 3. 牧师 (高感知，平衡属性)
-            DndCharacter cleric = new DndCharacter();
-            cleric.setId(3L);
-            cleric.setName("瑟拉菲娜");
-            cleric.setPlayerName("朋友B");
-            cleric.setDndClass("牧师");
-            cleric.setLevel(3);
-            cleric.setMaxHp(28);
-            cleric.setCurrentHp(28);
-            cleric.setArmorClass(15);
-            cleric.setStrength(12);
-            cleric.setDexterity(10);
-            cleric.setConstitution(14);
-            cleric.setIntelligence(12);
-            cleric.setWisdom(17);
-            cleric.setCharisma(12);
+        // Paladin 资源
+        CharacterResource smiteEvil = new CharacterResource("Smite Evil (破邪斩)", 1, 1, "LONG_REST");
+        CharacterResource layOnHands = new CharacterResource("Lay on Hands (圣疗点数)", 6, 6, "LONG_REST");
+        CharacterResource turnUndead = new CharacterResource("Turn Undead (驱散不死生物)", 0, 0, "LONG_REST");
 
-            // 4. 盗贼 (高敏捷，高爆发)
-            DndCharacter rogue = new DndCharacter();
-            rogue.setId(4L);
-            rogue.setName("影刃");
-            rogue.setPlayerName("朋友C");
-            rogue.setDndClass("盗贼");
-            rogue.setLevel(3);
-            rogue.setMaxHp(24);
-            rogue.setCurrentHp(24);
-            rogue.setArmorClass(14);
-            rogue.setStrength(10);
-            rogue.setDexterity(18);
-            rogue.setConstitution(12);
-            rogue.setIntelligence(12);
-            rogue.setWisdom(12);
-            rogue.setCharisma(14);
+        paladin.addResource(smiteEvil);
+        paladin.addResource(layOnHands);
+        paladin.addResource(turnUndead);
 
-            characterRepository.save(warrior);
-            characterRepository.save(mage);
-            characterRepository.save(cleric);
-            characterRepository.save(rogue);
+        // ==================== 角色 2: 维涅斯贝雅德 (Duskblade) ====================
+        DndCharacter duskblade = new DndCharacter();
+        duskblade.setId(2L);
+        duskblade.setName("维涅斯贝雅德");
+        duskblade.setPlayerName("维涅斯贝雅德");
+        duskblade.setDndClass("Duskblade");
+        duskblade.setRace("Half-Elf");
+        duskblade.setLevel(3);
+        duskblade.setMaxHp(33);
+        duskblade.setCurrentHp(33);
+        duskblade.setArmorClass(15);
+        duskblade.setImageUrl("/images/duskblade.jpg");
+        duskblade.setMainWeapon("+1 锋锐寒铁长剑 (+8 命中, 1d8+4 伤害)");
+        duskblade.setInitiative(2);
+        duskblade.setSpeed(30);
+        duskblade.setStrength(17);
+        duskblade.setDexterity(15);
+        duskblade.setConstitution(16);
+        duskblade.setIntelligence(16);
+        duskblade.setWisdom(15);
+        duskblade.setCharisma(11);
+        // 详细信息
+        duskblade.setGender("女");
+        duskblade.setAlignment("混乱中立");
+        duskblade.setFaith("莱拉");
+        duskblade.setAge(28);
+        duskblade.setHeight("174cm");
+        duskblade.setWeight("64kg");
 
-            System.out.println("数据初始化完成：已插入 4 个预设角色");
-        } else {
-            System.out.println("数据库已有数据，跳过初始化");
-        }
+        // Duskblade 资源
+        CharacterResource arcaneAttunement = new CharacterResource("奥能同调 (Arcane Attunement)", 6, 6, "LONG_REST");
+        CharacterResource spellsLv0 = new CharacterResource("0环法术位 (Spells Lv0)", 5, 5, "LONG_REST");
+        CharacterResource spellsLv1 = new CharacterResource("1环法术位 (Spells Lv1)", 5, 5, "LONG_REST");
+
+        duskblade.addResource(arcaneAttunement);
+        duskblade.addResource(spellsLv0);
+        duskblade.addResource(spellsLv1);
+
+        // ==================== 角色 3: ame^^ (Warlock) ====================
+        DndCharacter warlock = new DndCharacter();
+        warlock.setId(3L);
+        warlock.setName("ame^^");
+        warlock.setPlayerName("ame^^");
+        warlock.setDndClass("Warlock");
+        warlock.setRace("Half-Orc");
+        warlock.setLevel(3);
+        warlock.setMaxHp(27);
+        warlock.setCurrentHp(27);
+        warlock.setArmorClass(14);
+        warlock.setImageUrl("/images/warlock.jpg");
+        warlock.setMainWeapon("魔焰 (Eldritch Blast) (远程接触 +4, 2d6 伤害)");
+        warlock.setInitiative(6);
+        warlock.setSpeed(30);
+        warlock.setStrength(14);
+        warlock.setDexterity(14);
+        warlock.setConstitution(14);
+        warlock.setIntelligence(10);
+        warlock.setWisdom(10);
+        warlock.setCharisma(16);
+        // 详细信息
+        warlock.setGender("女");
+        warlock.setAlignment("混乱邪恶");
+        warlock.setFaith("");
+        warlock.setAge(20);
+        warlock.setHeight("198cm");
+        warlock.setWeight("100kg");
+
+        // Warlock 资源
+        CharacterResource eldritchBlast = new CharacterResource("魔焰 (Eldritch Blast)", 999, 999, "NONE");
+        CharacterResource dr = new CharacterResource("伤害减免 (DR)", 1, 1, "NONE");
+
+        warlock.addResource(eldritchBlast);
+        warlock.addResource(dr);
+
+        // ==================== 角色 4: 葉月音音 (Bard) ====================
+        DndCharacter bard = new DndCharacter();
+        bard.setId(4L);
+        bard.setName("葉月音音");
+        bard.setPlayerName("葉月音音");
+        bard.setDndClass("Bard");
+        bard.setRace("Human");
+        bard.setLevel(3);
+        bard.setMaxHp(18);
+        bard.setCurrentHp(18);
+        bard.setArmorClass(15);
+        bard.setImageUrl("/images/bard.jpg");
+        bard.setMainWeapon("武士刀 (天照十字切) (+7 命中, 2d3+1d4+3 伤害)");
+        bard.setInitiative(7);
+        bard.setSpeed(30);
+        bard.setStrength(9);
+        bard.setDexterity(16);
+        bard.setConstitution(11);
+        bard.setIntelligence(16);
+        bard.setWisdom(13);
+        bard.setCharisma(17);
+        // 详细信息
+        bard.setGender("女");
+        bard.setAlignment("混乱善良");
+        bard.setFaith("圣爱音");
+        bard.setAge(18);
+        bard.setHeight("165cm");
+        bard.setWeight("保密");
+
+        // Bard 资源
+        CharacterResource bardicMusic = new CharacterResource("吟唱次数 (Bardic Music)", 3, 3, "LONG_REST");
+        CharacterResource bardSpellsLv0 = new CharacterResource("0环法术位 (Spells Lv0)", 3, 3, "LONG_REST");
+        CharacterResource bardSpellsLv1 = new CharacterResource("1环法术位 (Spells Lv1)", 2, 2, "LONG_REST");
+        CharacterResource bardSpellsLv2 = new CharacterResource("2环法术位 (Spells Lv2)", 1, 1, "LONG_REST");
+
+        bard.addResource(bardicMusic);
+        bard.addResource(bardSpellsLv0);
+        bard.addResource(bardSpellsLv1);
+        bard.addResource(bardSpellsLv2);
+
+        // 保存所有角色（级联保存资源）
+        characterRepository.save(paladin);
+        characterRepository.save(duskblade);
+        characterRepository.save(warlock);
+        characterRepository.save(bard);
+
+        System.out.println("✅ 数据初始化完成：已插入 4 个真实角色及资源");
+        System.out.println("   - 瓦莱里安 (Paladin) - 3 资源");
+        System.out.println("   - 维涅斯贝雅德 (Duskblade) - 3 资源");
+        System.out.println("   - ame^^ (Warlock) - 2 资源");
+        System.out.println("   - 葉月音音 (Bard) - 4 资源");
     }
 }

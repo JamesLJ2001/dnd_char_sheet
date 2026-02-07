@@ -14,14 +14,34 @@ function selectCharacter(id) {
   router.push(`/character/${id}`)
 }
 
-function getAvatarColor(id) {
-  const colors = [
-    'from-red-600 to-red-800',
-    'from-blue-600 to-blue-800',
-    'from-green-600 to-green-800',
-    'from-purple-600 to-purple-800'
-  ]
-  return colors[(id - 1) % colors.length]
+function getClassColor(dndClass) {
+  const colors = {
+    'Paladin': 'from-yellow-600 via-amber-500 to-yellow-700',
+    'Duskblade': 'from-purple-600 via-indigo-500 to-purple-700',
+    'Warlock': 'from-red-600 via-rose-500 to-red-700',
+    'Bard': 'from-blue-600 via-cyan-500 to-blue-700'
+  }
+  return colors[dndClass] || 'from-gray-600 to-gray-800'
+}
+
+function getClassIcon(dndClass) {
+  const icons = {
+    'Paladin': '⚔️',
+    'Duskblade': '🗡️',
+    'Warlock': '🔮',
+    'Bard': '🎸'
+  }
+  return icons[dndClass] || '⭐'
+}
+
+function getClassName(dndClass) {
+  const names = {
+    'Paladin': '圣武士',
+    'Duskblade': '暮刃',
+    'Warlock': '邪术师',
+    'Bard': '吟游诗人'
+  }
+  return names[dndClass] || dndClass
 }
 
 function getHpPercentage(currentHp, maxHp) {
@@ -30,73 +50,120 @@ function getHpPercentage(currentHp, maxHp) {
 }
 
 function getHpColor(percentage) {
-  if (percentage > 60) return 'bg-green-600'
-  if (percentage > 30) return 'bg-yellow-600'
-  return 'bg-red-600'
+  if (percentage > 60) return 'from-emerald-500 to-emerald-600'
+  if (percentage > 30) return 'from-amber-500 to-amber-600'
+  return 'from-red-500 to-red-600'
+}
+
+function getHpBarColor(percentage) {
+  if (percentage > 60) return 'linear-gradient(to right, #2d5a27, #1a3d1a)'
+  if (percentage > 30) return 'linear-gradient(to right, #5a4a20, #3d3515)'
+  return 'linear-gradient(to right, #5a2020, #3d1515)'
 }
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-8">
-    <div class="max-w-7xl mx-auto">
-      <h1 class="text-5xl font-bold text-center mb-4 text-amber-500" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
-        角色大厅
-      </h1>
-      <p class="text-center text-gray-400 mb-12 text-lg">选择你的英雄开始冒险</p>
+  <div class="min-h-screen p-8 dungeon-bg">
 
-      <div v-if="characterStore.loading" class="text-center text-gray-400 text-xl py-20">
-        加载中...
+    <div class="relative max-w-7xl mx-auto">
+      <!-- 标题区 -->
+      <div class="text-center mb-16">
+        <div class="inline-block iron-header px-12 py-6 mb-4" style="border: 4px solid #4a4a4a; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);">
+          <h1 class="text-5xl font-black mb-2 font-gothic" style="color: #f4e4bc; text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 215, 0, 0.3);">
+            ⚔️ 边境诸国 ⚔️
+          </h1>
+        </div>
+        <p class="text-xl font-heavy font-heading" style="color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">选择你的英雄，开启史诗冒险</p>
       </div>
 
-      <div v-else-if="characterStore.error" class="text-center text-red-500 text-xl py-20">
-        加载失败: {{ characterStore.error }}
+      <!-- 加载状态 -->
+      <div v-if="characterStore.loading" class="text-center py-32">
+        <div class="inline-block p-6 rounded-2xl wood-texture iron-border" style="min-width: 200px;">
+          <div class="text-2xl font-black mb-3 parchment-text" style="font-family: 'Times New Roman', serif;">加载中...</div>
+          <div class="animate-spin rounded-full h-12 w-12 border-4 mx-auto" style="border-color: #f4e4bc; border-top-color: transparent;"></div>
+        </div>
       </div>
 
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <!-- 错误状态 -->
+      <div v-else-if="characterStore.error" class="text-center py-32">
+        <div class="text-6xl mb-4">⚠️</div>
+        <p class="text-xl font-bold" style="color: #8b4513;">加载失败: {{ characterStore.error }}</p>
+      </div>
+
+      <!-- 角色卡片网格 -->
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         <div
           v-for="character in characterStore.characters"
           :key="character.id"
           @click="selectCharacter(character.id)"
-          class="bg-gradient-to-b from-gray-800 to-gray-900 rounded-xl p-6 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl border-2 border-amber-700 hover:border-amber-500"
-          style="box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);"
+          class="group relative wood-texture iron-border iron-rivet p-6 cursor-pointer transform transition-all duration-500 hover:scale-105"
+          style="box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6); min-height: 320px;"
         >
-          <div class="flex flex-col items-center">
-            <div
-              :class="[
-                'w-24 h-24 rounded-full bg-gradient-to-br mb-4 flex items-center justify-center text-4xl font-bold text-white border-4 border-amber-600',
-                getAvatarColor(character.id)
-              ]"
-            >
-              {{ character.name.charAt(0) }}
+          <div class="relative h-full flex flex-col">
+            <!-- 职业图标 - 使用真实头像 -->
+            <div class="flex justify-center mb-4">
+              <img
+                :src="character.imageUrl"
+                :alt="character.name"
+                class="w-24 h-24 rounded-xl object-cover shadow-lg transform group-hover:scale-110 transition-transform duration-300"
+                style="border: 4px solid #4a4a4a; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);"
+              >
             </div>
 
-            <h2 class="text-2xl font-bold text-amber-400 mb-2">{{ character.name }}</h2>
-            <div class="text-gray-400 mb-4">
-              <span class="text-lg">{{ character.dndClass }}</span>
-              <span class="mx-2">•</span>
-              <span class="text-lg">Lv.{{ character.level }}</span>
+            <!-- 角色信息 -->
+            <h2 class="text-2xl font-black mb-1 text-center font-title" style="color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">
+              {{ character.playerName || character.name }}
+            </h2>
+            <div class="text-center mb-4">
+              <span class="inline-block px-3 py-1 rounded text-xs font-bold" style="background: linear-gradient(180deg, #5a5a5a 0%, #3a3a3a 100%); color: #f4e4bc; border: 2px solid #4a4a4a;">
+                {{ character.race }} {{ getClassName(character.dndClass) }}
+              </span>
             </div>
 
-            <div class="w-full">
-              <div class="flex justify-between text-sm text-gray-400 mb-1">
-                <span>HP</span>
-                <span>{{ character.currentHp }} / {{ character.maxHp }}</span>
+            <!-- 详细信息 -->
+            <div class="mb-4 flex-grow">
+              <div class="parchment p-3 rounded text-sm space-y-1" style="border: 2px solid #5a4025;">
+                <div class="flex justify-between" style="color: #5d4025;">
+                  <span class="font-bold">性别</span>
+                  <span>{{ character.gender || '未知' }}</span>
+                </div>
+                <div class="flex justify-between" style="color: #5d4025;">
+                  <span class="font-bold">阵营</span>
+                  <span>{{ character.alignment || '未知' }}</span>
+                </div>
+                <div class="flex justify-between" style="color: #5d4025;">
+                  <span class="font-bold">信仰</span>
+                  <span class="text-right" style="max-width: 120px;">{{ character.faith || '无' }}</span>
+                </div>
+                <div class="flex justify-between" style="color: #5d4025;">
+                  <span class="font-bold">年龄</span>
+                  <span>{{ character.age || '?' }} 岁</span>
+                </div>
+                <div class="flex justify-between" style="color: #5d4025;">
+                  <span class="font-bold">身高/体重</span>
+                  <span>{{ character.height || '?' }} / {{ character.weight || '?' }}</span>
+                </div>
               </div>
-              <div class="w-full bg-gray-700 rounded-full h-4 overflow-hidden">
-                <div
-                  :class="[
-                    'h-full transition-all duration-500',
-                    getHpColor(getHpPercentage(character.currentHp, character.maxHp))
-                  ]"
-                  :style="{ width: getHpPercentage(character.currentHp, character.maxHp) + '%' }"
-                ></div>
-              </div>
             </div>
 
-            <div class="mt-4 text-sm text-gray-500">
-              <span>AC: {{ character.armorClass }}</span>
+            <!-- 底部信息 -->
+            <div class="flex justify-end items-center text-sm border-t-2 pt-4" style="border-color: #5a4025;">
+              <div class="font-bold metal-shine">
+                查看详情 →
+              </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- 底部装饰 -->
+      <div class="text-center mt-16 mb-8">
+        <p class="text-lg font-heading font-bold" style="color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">⚔️ 边境诸国 - 角色表 v2.0</p>
+        <p class="text-sm mt-2 font-body" style="color: #c4a777;">中世纪复古风格</p>
+        <!-- 调试信息 -->
+        <div class="mt-4 p-3 rounded text-xs" style="background: rgba(0, 0, 0, 0.5); border: 1px solid #4a4a4a;">
+          <p style="color: #f4e4bc;">版本: {{ appVersion }}</p>
+          <p style="color: #c4a777;">构建时间: {{ buildTime }}</p>
         </div>
       </div>
     </div>
