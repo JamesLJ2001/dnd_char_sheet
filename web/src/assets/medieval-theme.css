@@ -1,29 +1,18 @@
 /* 中世纪复古主题 - Medieval Theme */
 
-/* 木纹纹理 */
+/* 木纹纹理 - 使用真实图片 */
 .wood-texture {
   background-color: #3d2914;
-  background-image:
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 0, 0, 0.1) 2px,
-      rgba(0, 0, 0, 0.1) 4px
-    ),
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 50px,
-      rgba(93, 64, 43, 0.3) 50px,
-      rgba(93, 64, 43, 0.3) 51px
-    );
+  background-image: url('/images/wood-texture.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-/* 铁栅栏边框 */
+/* 铁栅栏边框 - 使用真实图片 */
 .iron-border {
   border: 4px solid #4a4a4a;
-  border-image: linear-gradient(135deg, #6b6b6b 0%, #3a3a3a 50%, #6b6b6b 100%) 1;
+  border-image: url('/images/iron-border.jpg') 30 round;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
     inset 0 -1px 0 rgba(0, 0, 0, 0.3),
@@ -58,21 +47,16 @@
   right: 4px;
 }
 
-/* 羊皮纸背景 */
+/* 羊皮纸背景 - 使用真实图片 */
 .parchment {
-  background: linear-gradient(135deg, #f4e4bc 0%, #e8d4a8 50%, #f4e4bc 100%);
+  background: #f4e4bc;
+  background-image: url('/images/parchment-texture.jpg');
+  background-size: cover;
+  background-position: center;
   box-shadow:
     inset 0 0 50px rgba(139, 90, 43, 0.2),
     0 4px 8px rgba(0, 0, 0, 0.3);
   position: relative;
-}
-
-.parchment::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
-  pointer-events: none;
 }
 
 /* 铁艺标题栏 */
@@ -187,17 +171,22 @@
   background: linear-gradient(180deg, #6a6a6a 0%, #4a4a4a 100%);
 }
 
-/* 全局背景 */
+/* 全局背景 - 地下城石墙 */
 body {
   background-color: #1a1a1a;
-  background-image:
-    radial-gradient(ellipse at 20% 20%, rgba(61, 41, 20, 0.3) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(61, 41, 20, 0.3) 0%, transparent 50%),
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 0, 0, 0.05) 2px,
-      rgba(0, 0, 0, 0.05) 4px
-    );
+  background-image: url('/images/dungeon-wall.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+/* 地下城背景类 - 用于其他容器 */
+.dungeon-bg {
+  background-color: #1a1a1a;
+  background-image: url('/images/dungeon-wall.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }

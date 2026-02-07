@@ -63,25 +63,7 @@ function getHpBarColor(percentage) {
 </script>
 
 <template>
-  <div class="min-h-screen p-8 relative overflow-hidden" style="background: linear-gradient(to bottom right, #020617, #0f172a, #1e1b4b);">
-
-    <!-- 多层背景装饰 -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none">
-      <!-- 大型渐变光晕 -->
-      <div class="absolute top-0 left-0 w-[600px] h-[600px] rounded-full blur-[120px] animate-pulse" style="background: rgba(217, 119, 6, 0.1);"></div>
-      <div class="absolute bottom-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] animate-pulse" style="background: rgba(147, 51, 234, 0.1); animation-delay: 1s;"></div>
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full blur-[150px]" style="background: rgba(79, 70, 229, 0.05);"></div>
-
-      <!-- 中型光斑 -->
-      <div class="absolute top-1/4 right-1/4 w-64 h-64 rounded-full blur-3xl" style="background: rgba(6, 182, 212, 0.1);"></div>
-      <div class="absolute bottom-1/3 left-1/4 w-72 h-72 rounded-full blur-3xl" style="background: rgba(244, 63, 94, 0.1);"></div>
-
-      <!-- 网格纹理 -->
-      <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 50px 50px; opacity: 0.02;"></div>
-
-      <!-- 扫描线效果 -->
-      <div class="absolute inset-0" style="background: linear-gradient(to bottom, transparent, rgba(15, 23, 42, 0.2), transparent); opacity: 0.3;"></div>
-    </div>
+  <div class="min-h-screen p-8 dungeon-bg">
 
     <div class="relative max-w-7xl mx-auto">
       <!-- 标题区 -->
@@ -91,7 +73,7 @@ function getHpBarColor(percentage) {
             ⚔️ 角色大厅 ⚔️
           </h1>
         </div>
-        <p class="text-xl font-medium parchment-text" style="font-family: 'Times New Roman', serif;">选择你的英雄，开启史诗冒险</p>
+        <p class="text-xl font-medium" style="font-family: 'Times New Roman', serif; color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">选择你的英雄，开启史诗冒险</p>
       </div>
 
       <!-- 加载状态 -->
@@ -132,7 +114,7 @@ function getHpBarColor(percentage) {
             </div>
 
             <!-- 角色信息 -->
-            <h2 class="text-3xl font-black mb-2 text-center parchment-text" style="font-family: 'Times New Roman', serif;">
+            <h2 class="text-3xl font-black mb-2 text-center" style="font-family: 'Times New Roman', serif; color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">
               {{ character.name }}
             </h2>
             <div class="text-center mb-4">
@@ -177,8 +159,8 @@ function getHpBarColor(percentage) {
 
       <!-- 底部装饰 -->
       <div class="text-center mt-16">
-        <p class="text-lg font-bold parchment-text" style="font-family: 'Times New Roman', serif;">🎲 Dungeons & Dragons 角色表 v2.0</p>
-        <p class="text-sm mt-2" style="color: #6b6b6b;">中世纪复古风格</p>
+        <p class="text-lg font-bold" style="font-family: 'Times New Roman', serif; color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">🎲 Dungeons & Dragons 角色表 v2.0</p>
+        <p class="text-sm mt-2" style="color: #c4a777;">中世纪复古风格</p>
       </div>
     </div>
   </div>

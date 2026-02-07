@@ -202,6 +202,224 @@ function getResourceColor(resource) {
   return 'from-red-500 to-rose-600'
 }
 
+// 技能特效系统
+const effectRefs = ref(new Map())
+
+function setEffectRef(resourceId, el) {
+  if (el) {
+    effectRefs.value.set(resourceId, el)
+  }
+}
+
+function getEffectClass(resourceName) {
+  const name = resourceName.toLowerCase()
+  if (name.includes('圣疗') || name.includes('lay') || name.includes('heal')) return 'effect-holy'
+  if (name.includes('奥术') || name.includes('arcane') || name.includes('pool')) return 'effect-arcane'
+  if (name.includes('邪术') || name.includes('warlock') || name.includes('eldritch')) return 'effect-infernal'
+  if (name.includes('激励') || name.includes('inspire') || name.includes('bardic')) return 'effect-inspire'
+  return 'effect-magic'
+}
+
+async function useResourceWithEffect(resource, event) {
+  console.log('🖱️ [CLICK] useResourceWithEffect called!')
+  console.log('🖱️ [CLICK] Resource:', resource.resourceName, 'current value:', resource.currentValue)
+
+  if (resource.currentValue <= 0) {
+    console.log('❌ [CLICK] Resource depleted, ignoring click')
+    return
+  }
+
+  // 触发特效
+  const button = event.currentTarget
+  console.log('🎯 [CLICK] Button element obtained:', button)
+  triggerEffectOnButton(button, resource.resourceName)
+
+  // 执行使用
+  await useResource(resource)
+  console.log('✅ [CLICK] Resource updated via API')
+}
+
+function triggerEffectOnButton(button, resourceName) {
+  console.log('🎨 [EFFECT] Fullscreen effect triggered for resource:', resourceName)
+
+  // 获取按钮位置作为特效中心点
+  const rect = button.getBoundingClientRect()
+  const centerX = rect.left + rect.width / 2
+  const centerY = rect.top + rect.height / 2
+  console.log('📐 [EFFECT] Effect center - X:', centerX, 'Y:', centerY)
+
+  // 创建全屏特效容器
+  const container = document.createElement('div')
+  container.style.cssText = `
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: visible;
+  `
+  document.body.appendChild(container)
+  console.log('✅ [EFFECT] Fullscreen container created')
+
+  // 根据资源名称确定颜色
+  const effectClass = getEffectClass(resourceName)
+  console.log('🏷️ [EFFECT] Effect class:', effectClass)
+
+  const colors = {
+    'effect-holy': { primary: '#ffd700', secondary: '#ffec8b', glow: 'rgba(255, 215, 0, 0.8)' },
+    'effect-arcane': { primary: '#9333ea', secondary: '#7c3aed', glow: 'rgba(147, 51, 234, 0.8)' },
+    'effect-infernal': { primary: '#22c55e', secondary: '#166534', glow: 'rgba(34, 197, 94, 0.8)' },
+    'effect-inspire': { primary: '#ec4899', secondary: '#f472b6', glow: 'rgba(236, 72, 153, 0.8)' },
+    'effect-magic': { primary: '#60a5fa', secondary: '#3b82f6', glow: 'rgba(96, 165, 250, 0.8)' }
+  }
+  const color = colors[effectClass] || colors['effect-magic']
+  console.log('🎨 [EFFECT] Color scheme:', color)
+
+  // 创建多个震撼的光环效果（从按钮位置扩散）
+  for (let ring = 0; ring < 3; ring++) {
+    const ripple = document.createElement('div')
+    ripple.style.cssText = `
+      position: absolute;
+      left: ${centerX}px;
+      top: ${centerY}px;
+      transform: translate(-50%, -50%);
+      width: 0;
+      height: 0;
+      border: ${4 + ring * 2}px solid ${color.glow};
+      border-radius: 50%;
+      box-shadow: 0 0 ${50 + ring * 20}px ${color.glow}, 0 0 ${100 + ring * 30}px ${color.primary};
+      animation: rippleExpand 1.5s ease-out ${ring * 0.15}s forwards;
+    `
+    container.appendChild(ripple)
+  }
+  console.log('✅ [EFFECT] 3 shockwave ripples created')
+
+  // 创建大量粒子（100个）从按钮爆发到全屏
+  console.log('🎆 [EFFECT] Creating 100 explosion particles...')
+  for (let i = 0; i < 100; i++) {
+    const particle = document.createElement('div')
+    const angle = (Math.PI * 2 * i) / 100
+    const distance = 200 + Math.random() * 600
+    const tx = Math.cos(angle) * distance
+    const ty = Math.sin(angle) * distance
+    const delay = Math.random() * 0.4
+    const duration = 1 + Math.random() * 0.8
+    const size = 6 + Math.random() * 12
+
+    particle.style.cssText = `
+      position: absolute;
+      left: ${centerX}px;
+      top: ${centerY}px;
+      width: ${size}px;
+      height: ${size}px;
+      background: radial-gradient(circle, ${color.primary}, ${color.secondary});
+      border-radius: 50%;
+      box-shadow: 0 0 ${size}px ${color.primary}, 0 0 ${size * 2}px ${color.primary};
+      animation: particleBurst ${duration}s ease-out ${delay}s forwards;
+      --tx: ${tx}px;
+      --ty: ${ty}px;
+    `
+
+    container.appendChild(particle)
+
+    setTimeout(() => {
+      particle.remove()
+    }, (delay + duration) * 1000)
+  }
+  console.log('✅ [EFFECT] 100 particles created')
+
+  // 添加额外的闪光粒子（50个）
+  console.log('✨ [EFFECT] Creating 50 sparkle particles...')
+  for (let i = 0; i < 50; i++) {
+    const sparkle = document.createElement('div')
+    const angle = Math.random() * Math.PI * 2
+    const distance = 100 + Math.random() * 800
+    const tx = Math.cos(angle) * distance
+    const ty = Math.sin(angle) * distance
+    const delay = Math.random() * 0.6
+    const duration = 0.8 + Math.random() * 0.6
+    const size = 3 + Math.random() * 8
+
+    sparkle.style.cssText = `
+      position: absolute;
+      left: ${centerX}px;
+      top: ${centerY}px;
+      width: ${size}px;
+      height: ${size}px;
+      background: ${color.primary};
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+      box-shadow: 0 0 ${size * 3}px ${color.primary};
+      animation: sparkleFloat ${duration}s ease-out ${delay}s forwards;
+      --tx: ${tx}px;
+      --ty: ${ty}px;
+    `
+
+    container.appendChild(sparkle)
+
+    setTimeout(() => {
+      sparkle.remove()
+    }, (delay + duration) * 1000)
+  }
+  console.log('✅ [EFFECT] 50 sparkles created')
+
+  // 添加动画关键帧
+  const existingStyle = document.getElementById('effect-animations')
+  if (!existingStyle) {
+    const style = document.createElement('style')
+    style.id = 'effect-animations'
+    style.textContent = `
+      @keyframes rippleExpand {
+        0% {
+          width: 0;
+          height: 0;
+          opacity: 1;
+        }
+        100% {
+          width: 150vmax;
+          height: 150vmax;
+          opacity: 0;
+        }
+      }
+      @keyframes particleBurst {
+        0% {
+          opacity: 1;
+          transform: translate(0, 0) scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(var(--tx), var(--ty)) scale(0);
+        }
+      }
+      @keyframes sparkleFloat {
+        0% {
+          opacity: 1;
+          transform: translate(0, 0) scale(1) rotate(0deg);
+        }
+        50% {
+          opacity: 0.8;
+          transform: translate(calc(var(--tx) * 0.5), calc(var(--ty) * 0.5)) scale(1.5) rotate(180deg);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(var(--tx), var(--ty)) scale(0) rotate(360deg);
+        }
+      }
+    `
+    document.head.appendChild(style)
+    console.log('✅ [EFFECT] Fullscreen animation keyframes injected')
+  } else {
+    console.log('♻️ [EFFECT] Animation keyframes already exist, skipping injection')
+  }
+
+  // 清理容器（延长时间让全屏特效播放完整）
+  setTimeout(() => {
+    container.remove()
+    console.log('🗑️ [EFFECT] Fullscreen container cleaned up')
+  }, 3000)
+}
+
 // 等级调整
 async function adjustLevel(delta) {
   if (!character.value) return
@@ -243,148 +461,138 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen p-4 md:p-6 relative overflow-hidden" style="background: linear-gradient(to bottom right, #020617, #0f172a, #1e1b4b);">
-
-    <!-- 多层背景装饰 -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none">
-      <!-- 大型渐变光晕 -->
-      <div class="absolute top-0 left-0 w-[600px] h-[600px] rounded-full blur-[120px] animate-pulse" style="background: rgba(217, 119, 6, 0.1);"></div>
-      <div class="absolute bottom-0 right-0 w-[600px] h-[600px] rounded-full blur-[120px] animate-pulse" style="background: rgba(147, 51, 234, 0.1); animation-delay: 1s;"></div>
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full blur-[150px]" style="background: rgba(79, 70, 229, 0.05);"></div>
-
-      <!-- 中型光斑 -->
-      <div class="absolute top-1/4 right-1/4 w-64 h-64 rounded-full blur-3xl" style="background: rgba(6, 182, 212, 0.1);"></div>
-      <div class="absolute bottom-1/3 left-1/4 w-72 h-72 rounded-full blur-3xl" style="background: rgba(244, 63, 94, 0.1);"></div>
-
-      <!-- 网格纹理 -->
-      <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 50px 50px; opacity: 0.02;"></div>
-
-      <!-- 扫描线效果 -->
-      <div class="absolute inset-0" style="background: linear-gradient(to bottom, transparent, rgba(15, 23, 42, 0.2), transparent); opacity: 0.3;"></div>
-    </div>
+  <div class="min-h-screen p-4 md:p-6 dungeon-bg">
 
     <div class="relative max-w-7xl mx-auto">
       <!-- 返回按钮 -->
       <button
         @click="router.push('/')"
-        class="mb-6 px-4 py-2 bg-gradient-to-r from-slate-800 to-slate-700 hover:from-slate-700 hover:to-slate-600 rounded-xl text-white font-medium transition-all duration-300 shadow-lg border border-slate-600 hover:border-amber-500/50 flex items-center gap-2"
+        class="wood-button mb-6 px-4 py-2 rounded-xl font-medium transition-all duration-300 flex items-center gap-2"
       >
         <span>←</span>
         <span>返回大厅</span>
       </button>
 
       <!-- 加载状态 -->
-      <div v-if="loading" class="text-center text-gray-400 text-xl py-32">
-        <div class="inline-block animate-spin rounded-full h-16 w-16 border-4 border-amber-500 border-t-transparent mb-6"></div>
-        <p>加载中...</p>
+      <div v-if="loading" class="text-center text-xl py-32">
+        <div class="inline-block p-6 rounded-2xl wood-texture iron-border" style="min-width: 200px;">
+          <div class="text-2xl font-black mb-3" style="color: #f4e4bc; font-family: 'Times New Roman', serif;">加载中...</div>
+          <div class="animate-spin rounded-full h-12 w-12 border-4 mx-auto" style="border-color: #f4e4bc; border-top-color: transparent;"></div>
+        </div>
       </div>
 
       <!-- 角色未找到 -->
-      <div v-else-if="!character" class="text-center text-red-400 text-xl py-32">
+      <div v-else-if="!character" class="text-center text-xl py-32">
         <div class="text-6xl mb-4">⚠️</div>
-        <p>角色未找到</p>
+        <p style="color: #8b4513;">角色未找到</p>
       </div>
 
       <!-- 三栏仪表盘布局 -->
       <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- 左栏 - 生存状态 (Survival) -->
-        <div class="survival-panel bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-slate-700/50">
+        <div class="survival-panel wood-texture iron-border rounded-2xl p-6">
           <!-- 头像区域 -->
           <div class="flex flex-col items-center mb-6">
             <div class="relative mb-4">
               <img
                 :src="character.imageUrl"
                 :alt="character.name"
-                class="w-32 h-32 rounded-2xl object-cover border-4 border-amber-500/50 shadow-2xl"
+                class="w-32 h-32 rounded-2xl object-cover shadow-2xl"
+                style="border: 4px solid #4a4a4a; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);"
               >
-              <div class="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center text-lg font-bold shadow-lg border-2 border-amber-400">
+              <div class="absolute -bottom-2 -right-2 w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold shadow-lg border-2" style="background: linear-gradient(180deg, #5a5a5a 0%, #3a3a3a 100%); border-color: #4a4a4a; color: #f4e4bc;">
                 {{ character.level }}
               </div>
             </div>
 
             <!-- 基本信息 -->
-            <h2 class="text-3xl font-black text-white mb-1">{{ character.name }}</h2>
+            <h2 class="text-3xl font-black mb-1" style="color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">{{ character.name }}</h2>
             <div class="flex items-center gap-2 mb-6">
-              <span class="px-3 py-1 bg-gradient-to-r from-amber-600 to-amber-700 rounded-full text-sm font-bold text-white shadow-md">
+              <span class="px-3 py-1 rounded-full text-sm font-bold shadow-md" style="background: linear-gradient(180deg, #5a5a5a 0%, #3a3a3a 100%); color: #f4e4bc; border: 2px solid #4a4a4a;">
                 {{ character.dndClass }}
               </span>
-              <span class="text-gray-400 text-sm">{{ character.race }}</span>
+              <span style="color: #c4a777;" class="text-sm">{{ character.race }}</span>
             </div>
 
             <!-- HP 血条 -->
             <div class="w-full mb-6">
               <div class="flex justify-between items-center mb-3">
-                <span class="text-lg font-bold text-white flex items-center gap-2">
+                <span class="text-lg font-bold flex items-center gap-2" style="color: #f4e4bc;">
                   <span class="text-2xl">❤️</span>
                   <span>生命值</span>
                 </span>
                 <div class="flex gap-2">
                   <button
                     @click="adjustHp(-1)"
-                    class="w-10 h-10 bg-gradient-to-br from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 rounded-xl text-white font-bold text-lg shadow-lg transform hover:scale-110 transition-all duration-200"
+                    class="wood-button w-10 h-10 rounded-xl font-bold text-lg transform hover:scale-110 transition-all duration-200"
                   >
                     −
                   </button>
                   <button
                     @click="adjustHp(1)"
-                    class="w-10 h-10 bg-gradient-to-br from-emerald-600 to-green-700 hover:from-emerald-500 hover:to-green-600 rounded-xl text-white font-bold text-lg shadow-lg transform hover:scale-110 transition-all duration-200"
+                    class="wood-button w-10 h-10 rounded-xl font-bold text-lg transform hover:scale-110 transition-all duration-200"
                   >
                     +
                   </button>
                 </div>
               </div>
-              <div class="text-2xl text-center text-white font-black mb-3">
-                {{ character.currentHp }} <span class="text-gray-500 text-lg">/ {{ character.maxHp }}</span>
+              <div class="text-2xl text-center font-black mb-3" style="color: #f4e4bc;">
+                {{ character.currentHp }} <span style="color: #8b4513;" class="text-lg">/ {{ character.maxHp }}</span>
               </div>
-              <div class="w-full bg-slate-700/50 rounded-full h-5 overflow-hidden backdrop-blur-sm shadow-inner">
+              <div class="w-full rounded-full h-5 overflow-hidden" style="background: #4a3520; border: 2px solid #3a2510;">
                 <div
-                  :class="['h-full rounded-full transition-all duration-700 shadow-lg', hpColor]"
-                  :style="{ width: hpPercent + '%' }"
+                  class="h-full rounded-full transition-all duration-700"
+                  :style="{
+                    width: hpPercent + '%',
+                    background: hpPercent > 60
+                      ? 'linear-gradient(to right, #1a3d1a, #2d5a27)'
+                      : hpPercent > 30
+                      ? 'linear-gradient(to right, #3d3515, #5a4a20)'
+                      : 'linear-gradient(to right, #3d1515, #5a2020)'
+                  }"
                 ></div>
               </div>
             </div>
 
             <!-- 防御属性 -->
             <div class="defense-grid grid grid-cols-3 gap-3 w-full mb-6">
-              <div class="bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-xl p-4 text-center border border-slate-600/30 backdrop-blur-sm">
+              <div class="parchment iron-border rounded-xl p-4 text-center">
                 <div class="text-2xl mb-1">🛡️</div>
-                <div class="text-xs text-gray-400 mb-1">护甲</div>
-                <div class="text-xl font-black text-amber-400">AC {{ character.armorClass }}</div>
+                <div class="text-xs mb-1" style="color: #5d4025;">护甲</div>
+                <div class="text-xl font-black" style="color: #8b4513;">AC {{ character.armorClass }}</div>
               </div>
-              <div class="bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-xl p-4 text-center border border-slate-600/30 backdrop-blur-sm">
+              <div class="parchment iron-border rounded-xl p-4 text-center">
                 <div class="text-2xl mb-1">⚡</div>
-                <div class="text-xs text-gray-400 mb-1">先攻</div>
-                <div class="text-xl font-black text-cyan-400">{{ formattedInitiative }}</div>
+                <div class="text-xs mb-1" style="color: #5d4025;">先攻</div>
+                <div class="text-xl font-black" style="color: #8b4513;">{{ formattedInitiative }}</div>
               </div>
-              <div class="bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-xl p-4 text-center border border-slate-600/30 backdrop-blur-sm">
+              <div class="parchment iron-border rounded-xl p-4 text-center">
                 <div class="text-2xl mb-1">👟</div>
-                <div class="text-xs text-gray-400 mb-1">速度</div>
-                <div class="text-xl font-black text-green-400">{{ character.speed }} ft</div>
+                <div class="text-xs mb-1" style="color: #5d4025;">速度</div>
+                <div class="text-xl font-black" style="color: #8b4513;">{{ character.speed }} ft</div>
               </div>
             </div>
 
             <!-- 检定列表 -->
             <div class="saves-grid grid grid-cols-1 gap-3 w-full">
-              <div class="text-sm font-bold text-amber-400 mb-2 flex items-center gap-2">
+              <div class="text-sm font-bold mb-2 flex items-center gap-2" style="color: #f4e4bc;">
                 <span>🎯</span>
                 <span>检定</span>
               </div>
               <div
                 v-for="save in saves"
                 :key="save.nameEn"
-                class="bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-xl p-3 border border-slate-600/30 backdrop-blur-sm"
+                class="parchment iron-border rounded-xl p-3"
               >
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
                     <span class="text-xl">{{ save.icon }}</span>
                     <div>
-                      <div class="text-xs text-gray-400 uppercase font-bold">{{ save.nameEn }}</div>
-                      <div class="text-sm text-white font-medium">{{ save.name }}</div>
+                      <div class="text-xs uppercase font-bold" style="color: #5d4025;">{{ save.nameEn }}</div>
+                      <div class="text-sm font-medium" style="color: #3d2914;">{{ save.name }}</div>
                     </div>
                   </div>
-                  <div
-                    :class="['text-2xl font-black bg-gradient-to-r bg-clip-text text-transparent', save.color]"
-                  >
+                  <div class="text-2xl font-black" style="color: #8b4513;">
                     {{ save.value }}
                   </div>
                 </div>
@@ -394,47 +602,45 @@ onMounted(async () => {
         </div>
 
         <!-- 中栏 - 战斗与属性 (Combat & Stats) -->
-        <div class="combat-panel bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-slate-700/50">
+        <div class="combat-panel wood-texture iron-border rounded-2xl p-6">
           <!-- 主武器卡片 -->
-          <div class="bg-gradient-to-r from-amber-900/50 via-amber-800/50 to-amber-900/50 rounded-xl p-5 mb-6 border border-amber-700/30 shadow-lg">
+          <div class="parchment iron-border rounded-xl p-5 mb-6">
             <div class="flex items-center gap-3 mb-3">
               <div class="text-3xl">⚔️</div>
-              <h3 class="text-lg font-bold text-amber-300">主武器</h3>
+              <h3 class="text-lg font-bold" style="color: #3d2914;">主武器</h3>
             </div>
-            <p class="text-white font-medium leading-relaxed">{{ character.mainWeapon }}</p>
+            <p class="parchment-text font-medium leading-relaxed">{{ character.mainWeapon }}</p>
           </div>
 
           <!-- 六维属性 -->
           <div class="mb-4 flex items-center gap-2">
             <div class="text-xl">📊</div>
-            <h3 class="text-xl font-bold text-amber-400">属性</h3>
+            <h3 class="text-xl font-bold" style="color: #f4e4bc;">属性</h3>
           </div>
           <div class="stats-grid grid grid-cols-3 gap-3">
             <div
               v-for="stat in stats"
               :key="stat.name"
-              class="group bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-xl p-4 text-center border border-slate-600/30 backdrop-blur-sm hover:border-slate-500/50 transition-all duration-300"
+              class="group parchment iron-border rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 cursor-default"
             >
-              <div class="text-xs text-gray-400 uppercase font-bold mb-1">{{ stat.nameEn }}</div>
-              <div
-                :class="['text-3xl font-black mb-1 bg-gradient-to-r bg-clip-text text-transparent', stat.color]"
-              >
+              <div class="text-xs uppercase font-bold mb-1" style="color: #5d4025;">{{ stat.nameEn }}</div>
+              <div class="text-3xl font-black mb-1" style="color: #8b4513;">
                 {{ stat.modifier }}
               </div>
-              <div class="text-xs text-gray-500 mb-2">({{ stat.name }} {{ stat.value }})</div>
-              <div class="text-xs text-amber-400 mb-2">检定 {{ stat.modifier }}</div>
+              <div class="text-xs mb-2" style="color: #5d4025;">({{ stat.name }} {{ stat.value }})</div>
+              <div class="text-xs mb-2" style="color: #5d4025;">检定 {{ stat.modifier }}</div>
               <div class="flex gap-1 justify-center">
                 <button
                   @click="adjustStat(stat.nameEn === 'STR' ? 'strength' : stat.nameEn === 'DEX' ? 'dexterity' : stat.nameEn === 'CON' ? 'constitution' : stat.nameEn === 'INT' ? 'intelligence' : stat.nameEn === 'WIS' ? 'wisdom' : 'charisma', -1)"
                   :disabled="stat.value <= 1"
-                  class="flex-1 bg-gradient-to-br from-red-600/80 to-rose-700/80 hover:from-red-500/80 hover:to-rose-600/80 disabled:from-slate-600/50 disabled:to-slate-700/50 disabled:cursor-not-allowed py-1 rounded text-white font-bold text-xs shadow-md transition-all duration-200 disabled:opacity-50"
+                  class="flex-1 wood-button disabled:cursor-not-allowed py-1 rounded font-bold text-xs disabled:opacity-50"
                 >
                   −
                 </button>
                 <button
                   @click="adjustStat(stat.nameEn === 'STR' ? 'strength' : stat.nameEn === 'DEX' ? 'dexterity' : stat.nameEn === 'CON' ? 'constitution' : stat.nameEn === 'INT' ? 'intelligence' : stat.nameEn === 'WIS' ? 'wisdom' : 'charisma', 1)"
                   :disabled="stat.value >= 30"
-                  class="flex-1 bg-gradient-to-br from-emerald-600/80 to-green-700/80 hover:from-emerald-500/80 hover:to-green-600/80 disabled:from-slate-600/50 disabled:to-slate-700/50 disabled:cursor-not-allowed py-1 rounded text-white font-bold text-xs shadow-md transition-all duration-200 disabled:opacity-50"
+                  class="flex-1 wood-button disabled:cursor-not-allowed py-1 rounded font-bold text-xs disabled:opacity-50"
                 >
                   +
                 </button>
@@ -443,22 +649,22 @@ onMounted(async () => {
           </div>
 
           <!-- 附加信息 -->
-          <div class="mt-6 bg-gradient-to-br from-slate-700/30 to-slate-800/30 rounded-xl p-4 border border-slate-600/30">
+          <div class="mt-6 parchment iron-border rounded-xl p-4">
             <div class="flex justify-between items-center">
-              <span class="text-gray-400 font-medium">等级</span>
+              <span class="font-medium" style="color: #5d4025;">等级</span>
               <div class="flex items-center gap-3">
                 <button
                   @click="adjustLevel(-1)"
                   :disabled="character.level <= 1"
-                  class="w-8 h-8 bg-gradient-to-br from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed rounded-lg text-white font-bold text-sm shadow-md transition-all duration-200 disabled:opacity-50"
+                  class="wood-button w-8 h-8 disabled:cursor-not-allowed rounded-lg font-bold text-sm disabled:opacity-50"
                 >
                   −
                 </button>
-                <span class="text-2xl font-black text-amber-400">Lv. {{ character.level }}</span>
+                <span class="text-2xl font-black" style="color: #8b4513;">Lv. {{ character.level }}</span>
                 <button
                   @click="adjustLevel(1)"
                   :disabled="character.level >= 20"
-                  class="w-8 h-8 bg-gradient-to-br from-emerald-600 to-green-700 hover:from-emerald-500 hover:to-green-600 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed rounded-lg text-white font-bold text-sm shadow-md transition-all duration-200 disabled:opacity-50"
+                  class="wood-button w-8 h-8 disabled:cursor-not-allowed rounded-lg font-bold text-sm disabled:opacity-50"
                 >
                   +
                 </button>
@@ -468,11 +674,11 @@ onMounted(async () => {
         </div>
 
         <!-- 右栏 - 资源管理 (Resource Manager) -->
-        <div class="resource-panel bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-slate-700/50">
+        <div class="resource-panel wood-texture iron-border rounded-2xl p-6">
           <!-- 长休按钮 -->
           <button
             @click="longRest"
-            class="w-full mb-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 text-white font-black py-4 px-6 rounded-xl transition-all duration-300 shadow-lg border border-indigo-400/50 hover:shadow-2xl transform hover:scale-105 flex items-center justify-center gap-3"
+            class="wood-button w-full mb-6 font-black py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-3"
           >
             <span class="text-2xl">🌙</span>
             <span class="text-lg">长休 (Long Rest)</span>
@@ -481,7 +687,7 @@ onMounted(async () => {
           <!-- 标题 -->
           <div class="flex items-center gap-2 mb-6">
             <div class="text-xl">💎</div>
-            <h3 class="text-xl font-bold text-amber-400">职业资源</h3>
+            <h3 class="text-xl font-bold" style="color: #f4e4bc;">职业资源</h3>
           </div>
 
           <!-- 资源列表 -->
@@ -489,38 +695,47 @@ onMounted(async () => {
             <div
               v-for="resource in character.resources"
               :key="resource.id"
-              class="resource-card bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-xl p-4 border border-slate-600/30 backdrop-blur-sm hover:border-slate-500/50 transition-all duration-300"
+              class="resource-card parchment iron-border rounded-xl p-4"
             >
               <div class="flex justify-between items-center mb-3">
-                <span class="font-bold text-white">{{ resource.resourceName }}</span>
+                <span class="font-bold parchment-text">{{ resource.resourceName }}</span>
                 <div class="flex items-center gap-2">
-                  <span class="text-sm text-gray-400">{{ resource.currentValue }}</span>
-                  <span class="text-sm text-gray-500">/</span>
-                  <span class="text-sm text-gray-400">{{ resource.maxValue }}</span>
+                  <span class="text-sm" style="color: #5d4025;">{{ resource.currentValue }}</span>
+                  <span class="text-sm" style="color: #8b4513;">/</span>
+                  <span class="text-sm" style="color: #5d4025;">{{ resource.maxValue }}</span>
                 </div>
               </div>
 
               <!-- 进度条 -->
-              <div class="w-full bg-slate-600/50 rounded-full h-3 mb-4 overflow-hidden backdrop-blur-sm">
+              <div class="w-full rounded-full h-3 mb-4 overflow-hidden" style="background: #4a3520; border: 2px solid #3a2510;">
                 <div
-                  :class="['h-full rounded-full transition-all duration-700 shadow-md', getResourceColor(resource)]"
-                  :style="{ width: getResourcePercent(resource) + '%' }"
+                  class="h-full rounded-full transition-all duration-700"
+                  :style="{
+                    width: getResourcePercent(resource) + '%',
+                    background: getResourceColor(resource) === 'from-blue-500 to-cyan-600'
+                      ? 'linear-gradient(to right, #1e40af, #0891b2)'
+                      : getResourceColor(resource) === 'from-amber-500 to-orange-600'
+                      ? 'linear-gradient(to right, #b45309, #c2410c)'
+                      : 'linear-gradient(to right, #991b1b, #be123c)'
+                  }"
                 ></div>
               </div>
 
               <!-- 操作按钮 -->
-              <div class="flex gap-2">
+              <div class="flex gap-2 relative" style="position: relative;">
                 <button
-                  @click="useResource(resource)"
+                  :id="`use-btn-${resource.id}`"
+                  @click="useResourceWithEffect(resource, $event)"
                   :disabled="resource.currentValue <= 0"
-                  class="flex-1 bg-gradient-to-r from-blue-600 to-cyan-700 hover:from-blue-500 hover:to-cyan-600 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed py-3 rounded-xl text-sm font-bold text-white shadow-md transition-all duration-200 disabled:opacity-50"
+                  class="flex-1 wood-button disabled:cursor-not-allowed py-3 rounded-xl text-sm font-bold disabled:opacity-50 relative z-10"
+                  style="position: relative;"
                 >
                   使用 (-1)
                 </button>
                 <button
                   @click="recoverResource(resource)"
                   :disabled="resource.currentValue >= resource.maxValue"
-                  class="flex-1 bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-500 hover:to-green-600 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed py-3 rounded-xl text-sm font-bold text-white shadow-md transition-all duration-200 disabled:opacity-50"
+                  class="flex-1 wood-button disabled:cursor-not-allowed py-3 rounded-xl text-sm font-bold disabled:opacity-50 relative z-10"
                 >
                   恢复 (+1)
                 </button>
@@ -531,7 +746,7 @@ onMounted(async () => {
           <!-- 空资源提示 -->
           <div v-if="!character.resources || character.resources.length === 0" class="text-center py-12">
             <div class="text-4xl mb-3">💫</div>
-            <p class="text-gray-500">此职业没有可管理的资源</p>
+            <p style="color: #8b7355;">此职业没有可管理的资源</p>
           </div>
         </div>
       </div>
@@ -540,4 +755,213 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+/* 圣疗术特效 - 金色圣光 + 羽毛飘落 */
+.effect-holy .particle {
+  background: radial-gradient(circle, #ffd700, #ffec8b);
+  border-radius: 50% 50% 50% 0;
+  animation: holyParticle 1s ease-out forwards;
+  box-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700;
+}
+
+.effect-holy .ripple {
+  border: 3px solid rgba(255, 215, 0, 0.8);
+  animation: holyRipple 1s ease-out forwards;
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.5), inset 0 0 30px rgba(255, 215, 0, 0.3);
+}
+
+@keyframes holyParticle {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx, 20px), -100px) scale(0.3) rotate(360deg);
+  }
+}
+
+@keyframes holyRipple {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  100% {
+    width: 200px;
+    height: 200px;
+    opacity: 0;
+  }
+}
+
+/* 奥术池特效 - 紫色闪电 + 魔法符文 */
+.effect-arcane .particle {
+  background: linear-gradient(135deg, #9333ea, #7c3aed);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  animation: arcaneParticle 0.8s ease-out forwards;
+  box-shadow: 0 0 15px #9333ea, 0 0 30px #9333ea;
+}
+
+.effect-arcane .ripple {
+  border: 3px solid rgba(147, 51, 234, 0.8);
+  animation: arcaneRipple 1s ease-out forwards;
+  box-shadow: 0 0 30px rgba(147, 51, 234, 0.5), inset 0 0 30px rgba(147, 51, 234, 0.3);
+}
+
+@keyframes arcaneParticle {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translate(var(--tx, 30px), var(--ty, -30px)) scale(1.2) rotate(180deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx, 60px), var(--ty, -60px)) scale(0) rotate(360deg);
+  }
+}
+
+@keyframes arcaneRipple {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 1;
+    border-radius: 50%;
+  }
+  50% {
+    border-radius: 0%;
+  }
+  100% {
+    width: 180px;
+    height: 180px;
+    opacity: 0;
+    border-radius: 50%;
+  }
+}
+
+/* 邪术精华特效 - 绿色邪火 + 神秘烟雾 */
+.effect-infernal .particle {
+  background: radial-gradient(circle, #22c55e, #166534);
+  border-radius: 50%;
+  animation: infernalParticle 1s ease-out forwards;
+  box-shadow: 0 0 15px #22c55e, 0 0 30px #22c55e;
+}
+
+.effect-infernal .ripple {
+  border: 3px solid rgba(34, 197, 94, 0.8);
+  animation: infernalRipple 1s ease-out forwards;
+  box-shadow: 0 0 30px rgba(34, 197, 94, 0.5), inset 0 0 30px rgba(34, 197, 94, 0.3);
+}
+
+@keyframes infernalParticle {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  30% {
+    transform: translate(0, -20px) scale(1.3);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx, -30px), -80px) scale(0.2);
+  }
+}
+
+@keyframes infernalRipple {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 1;
+    filter: blur(0px);
+  }
+  100% {
+    width: 220px;
+    height: 220px;
+    opacity: 0;
+    filter: blur(10px);
+  }
+}
+
+/* 诗人激励特效 - 彩色音符 + 音波扩散 */
+.effect-inspire .particle {
+  background: linear-gradient(135deg, #ec4899, #f472b6, #fb7185);
+  border-radius: 50% 50% 0 50%;
+  animation: inspireParticle 1.2s ease-out forwards;
+  box-shadow: 0 0 12px #ec4899, 0 0 24px #ec4899;
+}
+
+.effect-inspire .ripple {
+  border: 3px solid rgba(236, 72, 153, 0.8);
+  animation: inspireRipple 1.2s ease-out forwards;
+  box-shadow: 0 0 30px rgba(236, 72, 153, 0.5), inset 0 0 30px rgba(236, 72, 153, 0.3);
+}
+
+@keyframes inspireParticle {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  40% {
+    transform: translate(var(--tx, 25px), -40px) scale(1.1) rotate(90deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx, 50px), -120px) scale(0.4) rotate(180deg);
+  }
+}
+
+@keyframes inspireRipple {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 1;
+    border-radius: 50%;
+  }
+  70% {
+    border-radius: 50%;
+  }
+  100% {
+    width: 250px;
+    height: 250px;
+    opacity: 0;
+    border-radius: 30%;
+  }
+}
+
+/* 默认魔法特效 */
+.effect-magic .particle {
+  background: radial-gradient(circle, #60a5fa, #3b82f6);
+  border-radius: 50%;
+  animation: magicParticle 1s ease-out forwards;
+  box-shadow: 0 0 10px #60a5fa;
+}
+
+.effect-magic .ripple {
+  border: 3px solid rgba(96, 165, 250, 0.8);
+  animation: magicRipple 1s ease-out forwards;
+}
+
+@keyframes magicParticle {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx, 30px), var(--ty, -30px)) scale(0);
+  }
+}
+
+@keyframes magicRipple {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  100% {
+    width: 200px;
+    height: 200px;
+    opacity: 0;
+  }
+}
 </style>
