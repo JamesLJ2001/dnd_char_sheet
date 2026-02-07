@@ -15,12 +15,12 @@ const loading = ref(true)
 const stats = computed(() => {
   if (!character.value) return []
   return [
-    { name: 'STR', value: character.value.strength, modifier: calculateModifier(character.value.strength) },
-    { name: 'DEX', value: character.value.dexterity, modifier: calculateModifier(character.value.dexterity) },
-    { name: 'CON', value: character.value.constitution, modifier: calculateModifier(character.value.constitution) },
-    { name: 'INT', value: character.value.intelligence, modifier: calculateModifier(character.value.intelligence) },
-    { name: 'WIS', value: character.value.wisdom, modifier: calculateModifier(character.value.wisdom) },
-    { name: 'CHA', value: character.value.charisma, modifier: calculateModifier(character.value.charisma) }
+    { name: 'STR', value: character.value.strength, modifier: calculateModifier(character.value.strength), color: 'from-red-500 to-rose-600' },
+    { name: 'DEX', value: character.value.dexterity, modifier: calculateModifier(character.value.dexterity), color: 'from-green-500 to-emerald-600' },
+    { name: 'CON', value: character.value.constitution, modifier: calculateModifier(character.value.constitution), color: 'from-orange-500 to-amber-600' },
+    { name: 'INT', value: character.value.intelligence, modifier: calculateModifier(character.value.intelligence), color: 'from-blue-500 to-cyan-600' },
+    { name: 'WIS', value: character.value.wisdom, modifier: calculateModifier(character.value.wisdom), color: 'from-purple-500 to-violet-600' },
+    { name: 'CHA', value: character.value.charisma, modifier: calculateModifier(character.value.charisma), color: 'from-pink-500 to-rose-600' }
   ]
 })
 
@@ -34,6 +34,14 @@ function calculateModifier(value) {
 const hpPercent = computed(() => {
   if (!character.value) return 0
   return (character.value.currentHp / character.value.maxHp) * 100
+})
+
+// HP 颜色
+const hpColor = computed(() => {
+  const pct = hpPercent.value
+  if (pct > 60) return 'from-emerald-500 to-emerald-600'
+  if (pct > 30) return 'from-amber-500 to-amber-600'
+  return 'from-red-500 to-rose-600'
 })
 
 // 格式化先攻值
@@ -92,9 +100,9 @@ function getResourcePercent(resource) {
 // 资源颜色
 function getResourceColor(resource) {
   const percent = getResourcePercent(resource)
-  if (percent > 60) return 'bg-blue-500'
-  if (percent > 30) return 'bg-yellow-500'
-  return 'bg-red-500'
+  if (percent > 60) return 'from-blue-500 to-cyan-600'
+  if (percent > 30) return 'from-amber-500 to-orange-600'
+  return 'from-red-500 to-rose-600'
 }
 
 onMounted(async () => {
@@ -109,171 +117,221 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
-    <div class="max-w-7xl mx-auto">
+  <div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 p-4 md:p-6">
+    <!-- 背景装饰 -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute top-1/4 left-0 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-1/4 right-0 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto">
       <!-- 返回按钮 -->
       <button
         @click="router.push('/')"
-        class="mb-6 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-white transition-all"
+        class="mb-6 px-4 py-2 bg-gradient-to-r from-slate-800 to-slate-700 hover:from-slate-700 hover:to-slate-600 rounded-xl text-white font-medium transition-all duration-300 shadow-lg border border-slate-600 hover:border-amber-500/50 flex items-center gap-2"
       >
-        ← 返回角色大厅
+        <span>←</span>
+        <span>返回大厅</span>
       </button>
 
       <!-- 加载状态 -->
-      <div v-if="loading" class="text-center text-gray-400 text-xl py-20">
-        加载中...
+      <div v-if="loading" class="text-center text-gray-400 text-xl py-32">
+        <div class="inline-block animate-spin rounded-full h-16 w-16 border-4 border-amber-500 border-t-transparent mb-6"></div>
+        <p>加载中...</p>
       </div>
 
       <!-- 角色未找到 -->
-      <div v-else-if="!character" class="text-center text-red-500 text-xl py-20">
-        角色未找到
+      <div v-else-if="!character" class="text-center text-red-400 text-xl py-32">
+        <div class="text-6xl mb-4">⚠️</div>
+        <p>角色未找到</p>
       </div>
 
       <!-- 三栏仪表盘布局 -->
       <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- 左栏 - 生存状态 (Survival) -->
-        <div class="survival-panel bg-gray-800 rounded-xl p-6 shadow-xl">
-          <div class="flex flex-col items-center">
-            <!-- 头像 -->
-            <img
-              :src="character.imageUrl"
-              :alt="character.name"
-              class="w-32 h-32 rounded-full border-4 border-amber-600 mb-4 object-cover"
-            >
+        <div class="survival-panel bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-slate-700/50">
+          <!-- 头像区域 -->
+          <div class="flex flex-col items-center mb-6">
+            <div class="relative mb-4">
+              <img
+                :src="character.imageUrl"
+                :alt="character.name"
+                class="w-32 h-32 rounded-2xl object-cover border-4 border-amber-500/50 shadow-2xl"
+              >
+              <div class="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center text-lg font-bold shadow-lg border-2 border-amber-400">
+                {{ character.level }}
+              </div>
+            </div>
 
             <!-- 基本信息 -->
-            <h2 class="text-3xl font-bold text-amber-400 mb-2">{{ character.name }}</h2>
-            <p class="text-gray-400 text-lg mb-6">{{ character.dndClass }} • {{ character.race }}</p>
+            <h2 class="text-3xl font-black text-white mb-1">{{ character.name }}</h2>
+            <div class="flex items-center gap-2 mb-6">
+              <span class="px-3 py-1 bg-gradient-to-r from-amber-600 to-amber-700 rounded-full text-sm font-bold text-white shadow-md">
+                {{ character.dndClass }}
+              </span>
+              <span class="text-gray-400 text-sm">{{ character.race }}</span>
+            </div>
 
             <!-- HP 血条 -->
             <div class="w-full mb-6">
-              <div class="flex justify-between items-center mb-2">
-                <span class="text-xl font-bold text-white">HP</span>
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-lg font-bold text-white flex items-center gap-2">
+                  <span class="text-2xl">❤️</span>
+                  <span>生命值</span>
+                </span>
                 <div class="flex gap-2">
                   <button
                     @click="adjustHp(-1)"
-                    class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded font-bold transition-all"
+                    class="w-10 h-10 bg-gradient-to-br from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 rounded-xl text-white font-bold text-lg shadow-lg transform hover:scale-110 transition-all duration-200"
                   >
-                    [-]
+                    −
                   </button>
                   <button
                     @click="adjustHp(1)"
-                    class="bg-green-600 hover:bg-green-700 px-3 py-1 rounded font-bold transition-all"
+                    class="w-10 h-10 bg-gradient-to-br from-emerald-600 to-green-700 hover:from-emerald-500 hover:to-green-600 rounded-xl text-white font-bold text-lg shadow-lg transform hover:scale-110 transition-all duration-200"
                   >
-                    [+]
+                    +
                   </button>
                 </div>
               </div>
-              <div class="text-2xl text-center text-white font-bold mb-2">
-                {{ character.currentHp }} / {{ character.maxHp }}
+              <div class="text-2xl text-center text-white font-black mb-3">
+                {{ character.currentHp }} <span class="text-gray-500 text-lg">/ {{ character.maxHp }}</span>
               </div>
-              <div class="w-full bg-gray-700 rounded-full h-6 overflow-hidden">
+              <div class="w-full bg-slate-700/50 rounded-full h-5 overflow-hidden backdrop-blur-sm shadow-inner">
                 <div
-                  class="bg-red-600 h-6 rounded-full transition-all duration-500"
+                  :class="['h-full rounded-full transition-all duration-700 shadow-lg', hpColor]"
                   :style="{ width: hpPercent + '%' }"
                 ></div>
               </div>
             </div>
 
             <!-- 防御属性 -->
-            <div class="defense-grid grid grid-cols-3 gap-4 w-full mt-4">
-              <div class="text-center bg-gray-700 rounded-lg p-3">
-                <div class="text-3xl mb-1">🛡️</div>
-                <div class="text-xl font-bold text-amber-400">AC {{ character.armorClass }}</div>
+            <div class="defense-grid grid grid-cols-3 gap-3 w-full">
+              <div class="bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-xl p-4 text-center border border-slate-600/30 backdrop-blur-sm">
+                <div class="text-2xl mb-1">🛡️</div>
+                <div class="text-xs text-gray-400 mb-1">护甲</div>
+                <div class="text-xl font-black text-amber-400">AC {{ character.armorClass }}</div>
               </div>
-              <div class="text-center bg-gray-700 rounded-lg p-3">
-                <div class="text-3xl mb-1">⚡</div>
-                <div class="text-xl font-bold text-amber-400">Init {{ formattedInitiative }}</div>
+              <div class="bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-xl p-4 text-center border border-slate-600/30 backdrop-blur-sm">
+                <div class="text-2xl mb-1">⚡</div>
+                <div class="text-xs text-gray-400 mb-1">先攻</div>
+                <div class="text-xl font-black text-cyan-400">{{ formattedInitiative }}</div>
               </div>
-              <div class="text-center bg-gray-700 rounded-lg p-3">
-                <div class="text-3xl mb-1">👟</div>
-                <div class="text-xl font-bold text-amber-400">{{ character.speed }} ft</div>
+              <div class="bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-xl p-4 text-center border border-slate-600/30 backdrop-blur-sm">
+                <div class="text-2xl mb-1">👟</div>
+                <div class="text-xs text-gray-400 mb-1">速度</div>
+                <div class="text-xl font-black text-green-400">{{ character.speed }} ft</div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- 中栏 - 战斗与属性 (Combat & Stats) -->
-        <div class="combat-panel bg-gray-800 rounded-xl p-6 shadow-xl">
+        <div class="combat-panel bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-slate-700/50">
           <!-- 主武器卡片 -->
-          <div class="weapon-card bg-gradient-to-r from-amber-900 to-amber-800 rounded-lg p-4 mb-6">
-            <h3 class="text-lg font-bold text-amber-300 mb-2">⚔️ {{ character.mainWeapon }}</h3>
+          <div class="bg-gradient-to-r from-amber-900/50 via-amber-800/50 to-amber-900/50 rounded-xl p-5 mb-6 border border-amber-700/30 shadow-lg">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="text-3xl">⚔️</div>
+              <h3 class="text-lg font-bold text-amber-300">主武器</h3>
+            </div>
+            <p class="text-white font-medium leading-relaxed">{{ character.mainWeapon }}</p>
           </div>
 
-          <!-- 六维网格 (2x3) -->
-          <h3 class="text-xl font-bold text-amber-400 mb-4">属性</h3>
+          <!-- 六维属性 -->
+          <div class="mb-4 flex items-center gap-2">
+            <div class="text-xl">📊</div>
+            <h3 class="text-xl font-bold text-amber-400">属性</h3>
+          </div>
           <div class="stats-grid grid grid-cols-3 gap-3">
             <div
               v-for="stat in stats"
               :key="stat.name"
-              class="stat-card bg-gray-700 rounded-lg p-3 text-center hover:bg-gray-600 transition-all"
+              class="group bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-xl p-4 text-center border border-slate-600/30 backdrop-blur-sm hover:border-slate-500/50 transition-all duration-300 cursor-default"
             >
-              <div class="text-xs text-gray-400 uppercase font-bold">{{ stat.name }}</div>
-              <div class="text-3xl font-bold text-amber-400 my-1">{{ stat.modifier }}</div>
+              <div class="text-xs text-gray-400 uppercase font-bold mb-1">{{ stat.name }}</div>
+              <div
+                :class="['text-3xl font-black mb-1 bg-gradient-to-r bg-clip-text text-transparent', stat.color]"
+              >
+                {{ stat.modifier }}
+              </div>
               <div class="text-xs text-gray-500">({{ stat.value }})</div>
             </div>
           </div>
 
-          <!-- 等级信息 -->
-          <div class="mt-6 bg-gray-700 rounded-lg p-4 text-center">
-            <div class="text-sm text-gray-400">等级</div>
-            <div class="text-3xl font-bold text-amber-400">Lv. {{ character.level }}</div>
+          <!-- 附加信息 -->
+          <div class="mt-6 bg-gradient-to-br from-slate-700/30 to-slate-800/30 rounded-xl p-4 border border-slate-600/30">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-400 font-medium">等级</span>
+              <span class="text-2xl font-black text-amber-400">Lv. {{ character.level }}</span>
+            </div>
           </div>
         </div>
 
         <!-- 右栏 - 资源管理 (Resource Manager) -->
-        <div class="resource-panel bg-gray-800 rounded-xl p-6 shadow-xl">
+        <div class="resource-panel bg-gradient-to-br from-slate-800/90 to-slate-900/90 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-slate-700/50">
           <!-- 长休按钮 -->
           <button
             @click="longRest"
-            class="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-bold py-3 px-6 rounded-lg mb-6 transition-all shadow-lg"
+            class="w-full mb-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 text-white font-black py-4 px-6 rounded-xl transition-all duration-300 shadow-lg border border-indigo-400/50 hover:shadow-2xl transform hover:scale-105 flex items-center justify-center gap-3"
           >
-            🌙 Long Rest (长休)
+            <span class="text-2xl">🌙</span>
+            <span class="text-lg">长休 (Long Rest)</span>
           </button>
 
-          <h3 class="text-xl font-bold text-amber-400 mb-4">Class Resources</h3>
+          <!-- 标题 -->
+          <div class="flex items-center gap-2 mb-6">
+            <div class="text-xl">💎</div>
+            <h3 class="text-xl font-bold text-amber-400">职业资源</h3>
+          </div>
 
           <!-- 资源列表 -->
-          <div
-            v-for="resource in character.resources"
-            :key="resource.id"
-            class="resource-card bg-gray-700 rounded-lg p-4 mb-3"
-          >
-            <div class="flex justify-between items-center mb-2">
-              <span class="font-bold text-white">{{ resource.resourceName }}</span>
-              <span class="text-sm text-gray-400">{{ resource.currentValue }} / {{ resource.maxValue }}</span>
-            </div>
+          <div class="space-y-4">
+            <div
+              v-for="resource in character.resources"
+              :key="resource.id"
+              class="resource-card bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-xl p-4 border border-slate-600/30 backdrop-blur-sm hover:border-slate-500/50 transition-all duration-300"
+            >
+              <div class="flex justify-between items-center mb-3">
+                <span class="font-bold text-white">{{ resource.resourceName }}</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm text-gray-400">{{ resource.currentValue }}</span>
+                  <span class="text-sm text-gray-500">/</span>
+                  <span class="text-sm text-gray-400">{{ resource.maxValue }}</span>
+                </div>
+              </div>
 
-            <!-- 进度条 -->
-            <div class="w-full bg-gray-600 rounded-full h-3 mb-3 overflow-hidden">
-              <div
-                :class="['h-3 rounded-full transition-all duration-500', getResourceColor(resource)]"
-                :style="{ width: getResourcePercent(resource) + '%' }"
-              ></div>
-            </div>
+              <!-- 进度条 -->
+              <div class="w-full bg-slate-600/50 rounded-full h-3 mb-4 overflow-hidden backdrop-blur-sm">
+                <div
+                  :class="['h-full rounded-full transition-all duration-700 shadow-md', getResourceColor(resource)]"
+                  :style="{ width: getResourcePercent(resource) + '%' }"
+                ></div>
+              </div>
 
-            <!-- 操作按钮 -->
-            <div class="flex gap-2">
-              <button
-                @click="useResource(resource)"
-                :disabled="resource.currentValue <= 0"
-                class="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed py-2 rounded text-sm font-bold transition-all"
-              >
-                Use (-1)
-              </button>
-              <button
-                @click="recoverResource(resource)"
-                :disabled="resource.currentValue >= resource.maxValue"
-                class="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed py-2 rounded text-sm font-bold transition-all"
-              >
-                Recover (+1)
-              </button>
+              <!-- 操作按钮 -->
+              <div class="flex gap-2">
+                <button
+                  @click="useResource(resource)"
+                  :disabled="resource.currentValue <= 0"
+                  class="flex-1 bg-gradient-to-r from-blue-600 to-cyan-700 hover:from-blue-500 hover:to-cyan-600 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed py-3 rounded-xl text-sm font-bold text-white shadow-md transition-all duration-200 disabled:opacity-50"
+                >
+                  使用 (-1)
+                </button>
+                <button
+                  @click="recoverResource(resource)"
+                  :disabled="resource.currentValue >= resource.maxValue"
+                  class="flex-1 bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-500 hover:to-green-600 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed py-3 rounded-xl text-sm font-bold text-white shadow-md transition-all duration-200 disabled:opacity-50"
+                >
+                  恢复 (+1)
+                </button>
+              </div>
             </div>
           </div>
 
           <!-- 空资源提示 -->
-          <div v-if="!character.resources || character.resources.length === 0" class="text-gray-500 text-center py-8">
-            此职业没有可管理的资源
+          <div v-if="!character.resources || character.resources.length === 0" class="text-center py-12">
+            <div class="text-4xl mb-3">💫</div>
+            <p class="text-gray-500">此职业没有可管理的资源</p>
           </div>
         </div>
       </div>
