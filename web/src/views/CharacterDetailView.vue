@@ -517,8 +517,8 @@ onMounted(async () => {
               <img
                 :src="character.imageUrl"
                 :alt="character.name"
-                class="w-32 h-32 rounded-2xl object-cover shadow-2xl"
-                style="border: 4px solid #4a4a4a; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6); object-position: top center;"
+                class="rounded-2xl object-cover shadow-2xl"
+                style="width: 140px; height: 140px; border: 4px solid #4a4a4a; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6); object-position: top 20%;"
               >
               <div class="absolute -bottom-2 -right-2 w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold shadow-lg border-2" style="background: linear-gradient(180deg, #5a5a5a 0%, #3a3a3a 100%); border-color: #4a4a4a; color: #f4e4bc;">
                 {{ character.level }}
