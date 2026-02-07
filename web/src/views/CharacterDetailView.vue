@@ -15,12 +15,12 @@ const loading = ref(true)
 const stats = computed(() => {
   if (!character.value) return []
   return [
-    { name: 'STR', value: character.value.strength, modifier: calculateModifier(character.value.strength), color: 'from-red-500 to-rose-600' },
-    { name: 'DEX', value: character.value.dexterity, modifier: calculateModifier(character.value.dexterity), color: 'from-green-500 to-emerald-600' },
-    { name: 'CON', value: character.value.constitution, modifier: calculateModifier(character.value.constitution), color: 'from-orange-500 to-amber-600' },
-    { name: 'INT', value: character.value.intelligence, modifier: calculateModifier(character.value.intelligence), color: 'from-blue-500 to-cyan-600' },
-    { name: 'WIS', value: character.value.wisdom, modifier: calculateModifier(character.value.wisdom), color: 'from-purple-500 to-violet-600' },
-    { name: 'CHA', value: character.value.charisma, modifier: calculateModifier(character.value.charisma), color: 'from-pink-500 to-rose-600' }
+    { name: '力量', nameEn: 'STR', value: character.value.strength, modifier: calculateModifier(character.value.strength), color: 'from-red-500 to-rose-600' },
+    { name: '敏捷', nameEn: 'DEX', value: character.value.dexterity, modifier: calculateModifier(character.value.dexterity), color: 'from-green-500 to-emerald-600' },
+    { name: '体质', nameEn: 'CON', value: character.value.constitution, modifier: calculateModifier(character.value.constitution), color: 'from-orange-500 to-amber-600' },
+    { name: '智力', nameEn: 'INT', value: character.value.intelligence, modifier: calculateModifier(character.value.intelligence), color: 'from-blue-500 to-cyan-600' },
+    { name: '感知', nameEn: 'WIS', value: character.value.wisdom, modifier: calculateModifier(character.value.wisdom), color: 'from-purple-500 to-violet-600' },
+    { name: '魅力', nameEn: 'CHA', value: character.value.charisma, modifier: calculateModifier(character.value.charisma), color: 'from-pink-500 to-rose-600' }
   ]
 })
 
@@ -103,6 +103,35 @@ function getResourceColor(resource) {
   if (percent > 60) return 'from-blue-500 to-cyan-600'
   if (percent > 30) return 'from-amber-500 to-orange-600'
   return 'from-red-500 to-rose-600'
+}
+
+// 等级调整
+async function adjustLevel(delta) {
+  if (!character.value) return
+  const newLevel = character.value.level + delta
+  if (newLevel < 1 || newLevel > 20) return
+
+  try {
+    await characterStore.updateCharacter(characterId.value, { level: newLevel })
+    character.value = characterStore.getCharacterById(characterId.value)
+  } catch (err) {
+    console.error('Failed to adjust level:', err)
+  }
+}
+
+// 属性调整
+async function adjustStat(statName, delta) {
+  if (!character.value) return
+  const currentValue = character.value[statName]
+  const newValue = currentValue + delta
+  if (newValue < 1 || newValue > 30) return
+
+  try {
+    await characterStore.updateCharacter(characterId.value, { [statName]: newValue })
+    character.value = characterStore.getCharacterById(characterId.value)
+  } catch (err) {
+    console.error('Failed to adjust stat:', err)
+  }
 }
 
 onMounted(async () => {
@@ -246,15 +275,32 @@ onMounted(async () => {
             <div
               v-for="stat in stats"
               :key="stat.name"
-              class="group bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-xl p-4 text-center border border-slate-600/30 backdrop-blur-sm hover:border-slate-500/50 transition-all duration-300 cursor-default"
+              class="group bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-xl p-4 text-center border border-slate-600/30 backdrop-blur-sm hover:border-slate-500/50 transition-all duration-300"
             >
-              <div class="text-xs text-gray-400 uppercase font-bold mb-1">{{ stat.name }}</div>
+              <div class="text-xs text-gray-400 uppercase font-bold mb-1">{{ stat.nameEn }}</div>
               <div
                 :class="['text-3xl font-black mb-1 bg-gradient-to-r bg-clip-text text-transparent', stat.color]"
               >
                 {{ stat.modifier }}
               </div>
-              <div class="text-xs text-gray-500">({{ stat.value }})</div>
+              <div class="text-xs text-gray-500 mb-2">({{ stat.name }} {{ stat.value }})</div>
+              <div class="text-xs text-amber-400 mb-2">检定 {{ stat.modifier }}</div>
+              <div class="flex gap-1 justify-center">
+                <button
+                  @click="adjustStat(stat.nameEn === 'STR' ? 'strength' : stat.nameEn === 'DEX' ? 'dexterity' : stat.nameEn === 'CON' ? 'constitution' : stat.nameEn === 'INT' ? 'intelligence' : stat.nameEn === 'WIS' ? 'wisdom' : 'charisma', -1)"
+                  :disabled="stat.value <= 1"
+                  class="flex-1 bg-gradient-to-br from-red-600/80 to-rose-700/80 hover:from-red-500/80 hover:to-rose-600/80 disabled:from-slate-600/50 disabled:to-slate-700/50 disabled:cursor-not-allowed py-1 rounded text-white font-bold text-xs shadow-md transition-all duration-200 disabled:opacity-50"
+                >
+                  −
+                </button>
+                <button
+                  @click="adjustStat(stat.nameEn === 'STR' ? 'strength' : stat.nameEn === 'DEX' ? 'dexterity' : stat.nameEn === 'CON' ? 'constitution' : stat.nameEn === 'INT' ? 'intelligence' : stat.nameEn === 'WIS' ? 'wisdom' : 'charisma', 1)"
+                  :disabled="stat.value >= 30"
+                  class="flex-1 bg-gradient-to-br from-emerald-600/80 to-green-700/80 hover:from-emerald-500/80 hover:to-green-600/80 disabled:from-slate-600/50 disabled:to-slate-700/50 disabled:cursor-not-allowed py-1 rounded text-white font-bold text-xs shadow-md transition-all duration-200 disabled:opacity-50"
+                >
+                  +
+                </button>
+              </div>
             </div>
           </div>
 
@@ -262,7 +308,23 @@ onMounted(async () => {
           <div class="mt-6 bg-gradient-to-br from-slate-700/30 to-slate-800/30 rounded-xl p-4 border border-slate-600/30">
             <div class="flex justify-between items-center">
               <span class="text-gray-400 font-medium">等级</span>
-              <span class="text-2xl font-black text-amber-400">Lv. {{ character.level }}</span>
+              <div class="flex items-center gap-3">
+                <button
+                  @click="adjustLevel(-1)"
+                  :disabled="character.level <= 1"
+                  class="w-8 h-8 bg-gradient-to-br from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed rounded-lg text-white font-bold text-sm shadow-md transition-all duration-200 disabled:opacity-50"
+                >
+                  −
+                </button>
+                <span class="text-2xl font-black text-amber-400">Lv. {{ character.level }}</span>
+                <button
+                  @click="adjustLevel(1)"
+                  :disabled="character.level >= 20"
+                  class="w-8 h-8 bg-gradient-to-br from-emerald-600 to-green-700 hover:from-emerald-500 hover:to-green-600 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed rounded-lg text-white font-bold text-sm shadow-md transition-all duration-200 disabled:opacity-50"
+                >
+                  +
+                </button>
+              </div>
             </div>
           </div>
         </div>
