@@ -100,17 +100,14 @@ function getHpBarColor(percentage) {
           style="box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6); min-height: 320px;"
         >
           <div class="relative h-full flex flex-col">
-            <!-- 职业图标 -->
+            <!-- 职业图标 - 使用真实头像 -->
             <div class="flex justify-center mb-4">
-              <div
-                :class="[
-                  'w-20 h-20 rounded-lg flex items-center justify-center text-4xl shadow-lg transform group-hover:scale-110 transition-transform duration-300 border-4 border-gray-500',
-                  getClassColor(character.dndClass)
-                ]"
-                style="background: linear-gradient(135deg, #5a5a5a 0%, #3a3a3a 100%);"
+              <img
+                :src="character.imageUrl"
+                :alt="character.name"
+                class="w-24 h-24 rounded-xl object-cover shadow-lg transform group-hover:scale-110 transition-transform duration-300"
+                style="border: 4px solid #4a4a4a; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);"
               >
-                {{ getClassIcon(character.dndClass) }}
-              </div>
             </div>
 
             <!-- 角色信息 -->
