@@ -34,6 +34,16 @@ function getClassIcon(dndClass) {
   return icons[dndClass] || '⭐'
 }
 
+function getClassName(dndClass) {
+  const names = {
+    'Paladin': '圣武士',
+    'Duskblade': '暮刃',
+    'Warlock': '邪术师',
+    'Bard': '吟游诗人'
+  }
+  return names[dndClass] || dndClass
+}
+
 function getHpPercentage(currentHp, maxHp) {
   if (!maxHp || maxHp === 0) return 0
   return Math.max(0, Math.min(100, (currentHp / maxHp) * 100))
@@ -43,6 +53,12 @@ function getHpColor(percentage) {
   if (percentage > 60) return 'from-emerald-500 to-emerald-600'
   if (percentage > 30) return 'from-amber-500 to-amber-600'
   return 'from-red-500 to-red-600'
+}
+
+function getHpBarColor(percentage) {
+  if (percentage > 60) return 'linear-gradient(to right, #2d5a27, #1a3d1a)'
+  if (percentage > 30) return 'linear-gradient(to right, #5a4a20, #3d3515)'
+  return 'linear-gradient(to right, #5a2020, #3d1515)'
 }
 </script>
 
@@ -70,22 +86,26 @@ function getHpColor(percentage) {
     <div class="relative max-w-7xl mx-auto">
       <!-- 标题区 -->
       <div class="text-center mb-16">
-        <h1 class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 mb-4 tracking-tight" style="filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.3));">
-          ⚔️ 角色大厅 ⚔️
-        </h1>
-        <p class="text-xl text-gray-400 font-medium">选择你的英雄，开启史诗冒险</p>
+        <div class="inline-block iron-header px-12 py-6 mb-4" style="border: 4px solid #4a4a4a; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);">
+          <h1 class="text-5xl font-black mb-2" style="font-family: 'Times New Roman', serif; color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">
+            ⚔️ 角色大厅 ⚔️
+          </h1>
+        </div>
+        <p class="text-xl font-medium parchment-text" style="font-family: 'Times New Roman', serif;">选择你的英雄，开启史诗冒险</p>
       </div>
 
       <!-- 加载状态 -->
       <div v-if="characterStore.loading" class="text-center py-32">
-        <div class="inline-block animate-spin rounded-full h-16 w-16 border-4 border-amber-500 border-t-transparent"></div>
-        <p class="mt-6 text-gray-400 text-lg">加载中...</p>
+        <div class="inline-block p-6 rounded-2xl wood-texture iron-border" style="min-width: 200px;">
+          <div class="text-2xl font-black mb-3 parchment-text" style="font-family: 'Times New Roman', serif;">加载中...</div>
+          <div class="animate-spin rounded-full h-12 w-12 border-4 mx-auto" style="border-color: #f4e4bc; border-top-color: transparent;"></div>
+        </div>
       </div>
 
       <!-- 错误状态 -->
       <div v-else-if="characterStore.error" class="text-center py-32">
         <div class="text-6xl mb-4">⚠️</div>
-        <p class="text-red-400 text-xl">加载失败: {{ characterStore.error }}</p>
+        <p class="text-xl font-bold" style="color: #8b4513;">加载失败: {{ characterStore.error }}</p>
       </div>
 
       <!-- 角色卡片网格 -->
@@ -94,61 +114,60 @@ function getHpColor(percentage) {
           v-for="character in characterStore.characters"
           :key="character.id"
           @click="selectCharacter(character.id)"
-          class="group relative bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-xl rounded-2xl p-6 cursor-pointer transform transition-all duration-500 hover:scale-105 hover:shadow-2xl border border-slate-700/50 hover:border-amber-500/50 overflow-hidden"
-          style="box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);"
+          class="group relative wood-texture iron-border iron-rivet p-6 cursor-pointer transform transition-all duration-500 hover:scale-105"
+          style="box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6); min-height: 320px;"
         >
-          <!-- 悬浮光效 -->
-          <div class="absolute inset-0 bg-gradient-to-br from-amber-500/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-          <div class="relative">
+          <div class="relative h-full flex flex-col">
             <!-- 职业图标 -->
             <div class="flex justify-center mb-4">
               <div
                 :class="[
-                  'w-20 h-20 rounded-2xl bg-gradient-to-br flex items-center justify-center text-4xl shadow-lg transform group-hover:scale-110 transition-transform duration-300',
+                  'w-20 h-20 rounded-lg flex items-center justify-center text-4xl shadow-lg transform group-hover:scale-110 transition-transform duration-300 border-4 border-gray-500',
                   getClassColor(character.dndClass)
                 ]"
+                style="background: linear-gradient(135deg, #5a5a5a 0%, #3a3a3a 100%);"
               >
                 {{ getClassIcon(character.dndClass) }}
               </div>
             </div>
 
             <!-- 角色信息 -->
-            <h2 class="text-2xl font-black text-white mb-1 text-center group-hover:text-amber-400 transition-colors">
+            <h2 class="text-3xl font-black mb-2 text-center parchment-text" style="font-family: 'Times New Roman', serif;">
               {{ character.name }}
             </h2>
             <div class="text-center mb-4">
-              <span class="inline-block px-3 py-1 bg-gradient-to-r from-amber-600 to-amber-700 rounded-full text-sm font-bold text-white shadow-md">
-                {{ character.dndClass }}
+              <span class="inline-block px-4 py-2 rounded text-sm font-bold" style="background: linear-gradient(180deg, #5a5a5a 0%, #3a3a3a 100%); color: #f4e4bc; border: 2px solid #4a4a4a;">
+                {{ getClassName(character.dndClass) }}
               </span>
-              <span class="mx-2 text-gray-500">•</span>
-              <span class="text-amber-400 font-bold">Lv.{{ character.level }}</span>
+              <div class="mt-2 text-amber-400 font-bold text-lg">等级 {{ character.level }}</div>
             </div>
 
             <!-- HP 进度条 -->
-            <div class="mb-4">
-              <div class="flex justify-between text-sm mb-2">
-                <span class="text-gray-400 font-medium">HP</span>
-                <span class="text-white font-bold">{{ character.currentHp }} / {{ character.maxHp }}</span>
-              </div>
-              <div class="w-full bg-slate-700/50 rounded-full h-3 overflow-hidden backdrop-blur-sm">
-                <div
-                  :class="[
-                    'h-full rounded-full transition-all duration-700 shadow-lg',
-                    getHpColor(getHpPercentage(character.currentHp, character.maxHp))
-                  ]"
-                  :style="{ width: getHpPercentage(character.currentHp, character.maxHp) + '%' }"
-                ></div>
+            <div class="mb-4 flex-grow">
+              <div class="parchment p-3 rounded" style="border: 2px solid #5a4025;">
+                <div class="flex justify-between text-sm mb-2">
+                  <span class="font-bold parchment-text">生命值</span>
+                  <span class="font-black" style="color: #8b4513;">{{ character.currentHp }} / {{ character.maxHp }}</span>
+                </div>
+                <div class="w-full rounded-full h-4" style="background: #4a3520; border: 2px solid #3a2510;">
+                  <div
+                    :style="{
+                      width: getHpPercentage(character.currentHp, character.maxHp) + '%',
+                      background: getHpBarColor(getHpPercentage(character.currentHp, character.maxHp))
+                    }"
+                    class="h-full rounded-full transition-all duration-700"
+                  ></div>
+                </div>
               </div>
             </div>
 
             <!-- 底部信息 -->
-            <div class="flex justify-between items-center text-sm border-t border-slate-700/50 pt-4">
-              <div class="flex items-center gap-2 text-gray-400">
-                <span>🛡️</span>
-                <span class="font-bold">AC {{ character.armorClass }}</span>
+            <div class="flex justify-between items-center text-sm border-t-2 pt-4" style="border-color: #5a4025;">
+              <div class="flex items-center gap-2">
+                <span style="font-size: 1.5rem;">🛡️</span>
+                <span class="font-bold parchment-text" style="font-size: 1.1rem;">护甲 {{ character.armorClass }}</span>
               </div>
-              <div class="text-amber-500 font-bold">
+              <div class="font-bold metal-shine">
                 查看详情 →
               </div>
             </div>
@@ -157,8 +176,9 @@ function getHpColor(percentage) {
       </div>
 
       <!-- 底部装饰 -->
-      <div class="text-center mt-16 text-gray-500 text-sm">
-        <p>🎲 Dungeons & Dragons Character Sheet v2.0</p>
+      <div class="text-center mt-16">
+        <p class="text-lg font-bold parchment-text" style="font-family: 'Times New Roman', serif;">🎲 Dungeons & Dragons 角色表 v2.0</p>
+        <p class="text-sm mt-2" style="color: #6b6b6b;">中世纪复古风格</p>
       </div>
     </div>
   </div>
