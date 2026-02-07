@@ -467,10 +467,10 @@ onMounted(async () => {
       <!-- 返回按钮 -->
       <button
         @click="router.push('/')"
-        class="wood-button mb-6 px-4 py-2 rounded-xl font-medium transition-all duration-300 flex items-center gap-2"
+        class="wood-button mb-6 px-4 py-2 rounded-xl font-heading font-medium transition-all duration-300 flex items-center gap-2"
       >
         <span>←</span>
-        <span>返回大厅</span>
+        <span class="font-heavy">返回大厅</span>
       </button>
 
       <!-- 加载状态 -->
@@ -506,7 +506,7 @@ onMounted(async () => {
             </div>
 
             <!-- 基本信息 -->
-            <h2 class="text-3xl font-black mb-1" style="color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">{{ character.name }}</h2>
+            <h2 class="text-3xl font-black mb-1 font-title" style="color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">{{ character.name }}</h2>
             <div class="flex items-center gap-2 mb-6">
               <span class="px-3 py-1 rounded-full text-sm font-bold shadow-md" style="background: linear-gradient(180deg, #5a5a5a 0%, #3a3a3a 100%); color: #f4e4bc; border: 2px solid #4a4a4a;">
                 {{ character.dndClass }}
@@ -517,7 +517,7 @@ onMounted(async () => {
             <!-- HP 血条 -->
             <div class="w-full mb-6">
               <div class="flex justify-between items-center mb-3">
-                <span class="text-lg font-bold flex items-center gap-2" style="color: #f4e4bc;">
+                <span class="text-lg font-bold flex items-center gap-2 font-heading font-heavy" style="color: #f4e4bc;">
                   <span class="text-2xl">❤️</span>
                   <span>生命值</span>
                 </span>
@@ -575,7 +575,7 @@ onMounted(async () => {
 
             <!-- 检定列表 -->
             <div class="saves-grid grid grid-cols-1 gap-3 w-full">
-              <div class="text-sm font-bold mb-2 flex items-center gap-2" style="color: #f4e4bc;">
+              <div class="text-sm font-bold mb-2 flex items-center gap-2 font-heading font-heavy" style="color: #f4e4bc;">
                 <span>🎯</span>
                 <span>检定</span>
               </div>
@@ -607,15 +607,15 @@ onMounted(async () => {
           <div class="parchment iron-border rounded-xl p-5 mb-6">
             <div class="flex items-center gap-3 mb-3">
               <div class="text-3xl">⚔️</div>
-              <h3 class="text-lg font-bold" style="color: #3d2914;">主武器</h3>
+              <h3 class="text-lg font-bold font-heading font-heavy" style="color: #3d2914;">主武器</h3>
             </div>
-            <p class="parchment-text font-medium leading-relaxed">{{ character.mainWeapon }}</p>
+            <p class="parchment-text font-body font-medium leading-relaxed">{{ character.mainWeapon }}</p>
           </div>
 
           <!-- 六维属性 -->
           <div class="mb-4 flex items-center gap-2">
             <div class="text-xl">📊</div>
-            <h3 class="text-xl font-bold" style="color: #f4e4bc;">属性</h3>
+            <h3 class="text-xl font-bold font-heading font-heavy" style="color: #f4e4bc;">属性</h3>
           </div>
           <div class="stats-grid grid grid-cols-3 gap-3">
             <div
@@ -678,16 +678,16 @@ onMounted(async () => {
           <!-- 长休按钮 -->
           <button
             @click="longRest"
-            class="wood-button w-full mb-6 font-black py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-3"
+            class="wood-button w-full mb-6 font-heading font-black py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-3"
           >
             <span class="text-2xl">🌙</span>
-            <span class="text-lg">长休 (Long Rest)</span>
+            <span class="text-lg font-heavy">长休 (Long Rest)</span>
           </button>
 
           <!-- 标题 -->
           <div class="flex items-center gap-2 mb-6">
             <div class="text-xl">💎</div>
-            <h3 class="text-xl font-bold" style="color: #f4e4bc;">职业资源</h3>
+            <h3 class="text-xl font-bold font-heading font-heavy" style="color: #f4e4bc;">职业资源</h3>
           </div>
 
           <!-- 资源列表 -->

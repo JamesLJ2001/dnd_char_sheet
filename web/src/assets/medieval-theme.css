@@ -1,5 +1,40 @@
 /* 中世纪复古主题 - Medieval Theme */
 
+/* ========== 中世纪奇幻字体 ========== */
+
+/* 主标题字体 - Cinzel (英文) + Noto Serif SC (中文) */
+.font-title {
+  font-family: 'Cinzel', 'Noto Serif SC', serif;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+/* 大标题字体 - MedievalSharp (英文) + 站酷小薇 (中文) */
+.font-heading {
+  font-family: 'MedievalSharp', 'ZCOOL XiaoWei', cursive;
+}
+
+/* 哥特式装饰字体 - UnifrakturMaguntia (英文) + 马善政毛笔 (中文) */
+.font-gothic {
+  font-family: 'UnifrakturMaguntia', 'Ma Shan Zheng', cursive;
+}
+
+/* 正文优雅字体 - Cormorant Garamond (英文) + Noto Serif SC (中文) */
+.font-body {
+  font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
+}
+
+/* 活泼字体 - 站酷快乐体 */
+.font-playful {
+  font-family: 'ZCOOL KuaiLe', cursive;
+}
+
+/* 粗体标题 - 思源宋体 Heavy */
+.font-heavy {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 900;
+}
+
 /* 木纹纹理 - 使用真实图片 */
 .wood-texture {
   background-color: #3d2914;

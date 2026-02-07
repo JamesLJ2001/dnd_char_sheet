@@ -69,11 +69,11 @@ function getHpBarColor(percentage) {
       <!-- 标题区 -->
       <div class="text-center mb-16">
         <div class="inline-block iron-header px-12 py-6 mb-4" style="border: 4px solid #4a4a4a; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);">
-          <h1 class="text-5xl font-black mb-2" style="font-family: 'Times New Roman', serif; color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">
+          <h1 class="text-5xl font-black mb-2 font-gothic" style="color: #f4e4bc; text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 215, 0, 0.3);">
             ⚔️ 角色大厅 ⚔️
           </h1>
         </div>
-        <p class="text-xl font-medium" style="font-family: 'Times New Roman', serif; color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">选择你的英雄，开启史诗冒险</p>
+        <p class="text-xl font-heavy font-heading" style="color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">选择你的英雄，开启史诗冒险</p>
       </div>
 
       <!-- 加载状态 -->
@@ -114,7 +114,7 @@ function getHpBarColor(percentage) {
             </div>
 
             <!-- 角色信息 -->
-            <h2 class="text-3xl font-black mb-2 text-center" style="font-family: 'Times New Roman', serif; color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">
+            <h2 class="text-3xl font-black mb-2 text-center font-title" style="color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">
               {{ character.name }}
             </h2>
             <div class="text-center mb-4">
@@ -159,8 +159,8 @@ function getHpBarColor(percentage) {
 
       <!-- 底部装饰 -->
       <div class="text-center mt-16">
-        <p class="text-lg font-bold" style="font-family: 'Times New Roman', serif; color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">🎲 Dungeons & Dragons 角色表 v2.0</p>
-        <p class="text-sm mt-2" style="color: #c4a777;">中世纪复古风格</p>
+        <p class="text-lg font-heading font-bold" style="color: #f4e4bc; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">🎲 Dungeons & Dragons 角色表 v2.0</p>
+        <p class="text-sm mt-2 font-body" style="color: #c4a777;">中世纪复古风格</p>
       </div>
     </div>
   </div>
