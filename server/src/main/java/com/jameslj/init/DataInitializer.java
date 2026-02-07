@@ -20,10 +20,10 @@ public class DataInitializer implements CommandLineRunner {
         // 清除旧数据
         characterRepository.deleteAll();
 
-        // ==================== 角色 1: 瓦莱里安 (Paladin) ====================
+        // ==================== 角色 1: 瓦莱里安-奥理安 (Paladin) ====================
         DndCharacter paladin = new DndCharacter();
         paladin.setId(1L);
-        paladin.setName("瓦莱里安");
+        paladin.setName("瓦莱里安-奥理安");
         paladin.setPlayerName("你");
         paladin.setDndClass("Paladin");
         paladin.setRace("Human");
