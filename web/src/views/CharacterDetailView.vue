@@ -152,6 +152,11 @@ async function adjustHp(delta) {
   try {
     await characterStore.adjustHp(characterId.value, delta)
     character.value = characterStore.getCharacterById(characterId.value)
+
+    // 检测死亡
+    if (character.value.currentHp <= 0) {
+      showDeathModal.value = true
+    }
   } catch (err) {
     console.error('Failed to adjust HP:', err)
   }
@@ -204,6 +209,10 @@ function getResourceColor(resource) {
 
 // 技能特效系统
 const effectRefs = ref(new Map())
+
+// 死亡弹窗状态
+const showDeathModal = ref(false)
+const isDying = ref(false)
 
 function setEffectRef(resourceId, el) {
   if (el) {
@@ -751,6 +760,33 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+
+    <!-- 死亡弹窗 -->
+    <div v-if="showDeathModal" class="fixed inset-0 z-[10000] flex items-center justify-center" style="background: rgba(0, 0, 0, 0.95);">
+      <div class="relative max-w-4xl w-full mx-4">
+        <!-- die.jpg 图片 -->
+        <img
+          src="/images/die.jpg"
+          alt="YOU DIED"
+          class="w-full rounded-2xl shadow-2xl"
+          style="border: 8px solid #5a0000; box-shadow: 0 0 60px rgba(255, 0, 0, 0.6), 0 0 120px rgba(139, 0, 0, 0.4);"
+        >
+
+        <!-- 彩蛋文字 -->
+        <div class="absolute bottom-8 left-0 right-0 text-center">
+          <h2 class="font-gothic text-red-500 mb-6 animate-pulse" style="font-size: 5rem; text-shadow: 0 0 30px rgba(255, 0, 0, 1), 0 0 60px rgba(255, 0, 0, 0.8), 0 0 90px rgba(139, 0, 0, 0.6);">
+            彩蛋
+          </h2>
+          <button
+            @click="showDeathModal = false"
+            class="wood-button px-12 py-4 rounded-2xl text-2xl font-bold font-heading transform hover:scale-110 transition-all duration-300"
+            style="background: linear-gradient(180deg, #8b0000 0%, #5a0000 50%, #3a0000 100%); border: 4px solid #ff4444; box-shadow: 0 0 30px rgba(255, 0, 0, 0.8);"
+          >
+            复活
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -963,5 +999,21 @@ onMounted(async () => {
     height: 200px;
     opacity: 0;
   }
+}
+
+/* 彩蛋文字脉冲动画 */
+@keyframes deathPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse {
+  animation: deathPulse 2s ease-in-out infinite;
 }
 </style>
