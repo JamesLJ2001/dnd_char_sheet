@@ -238,6 +238,59 @@ const effectRefs = ref(new Map())
 const showDeathModal = ref(false)
 const isDying = ref(false)
 
+// iOS Safari 触摸事件防抖
+const touchLock = ref(false)
+let touchTimer = null
+
+// 通用的触摸/点击处理函数（带防抖）
+async function handleTouchOrClick(handler, event, ...args) {
+  // 如果在触摸锁定期，忽略click事件（防止重复执行）
+  if (touchLock.value) {
+    console.log('🔒 [TOUCH] Locked, ignoring duplicate click')
+    return
+  }
+
+  // 执行处理函数（传递event作为第一个参数）
+  await handler(event, ...args)
+
+  // 触摸后的短暂锁定期，防止iOS的click重复触发
+  touchLock.value = true
+  clearTimeout(touchTimer)
+  touchTimer = setTimeout(() => {
+    touchLock.value = false
+  }, 300)
+}
+
+// 包装useResourceWithEffect以适应新的签名
+async function wrappedUseResource(event, resource) {
+  await useResourceWithEffect(resource, event)
+}
+
+// 包装recoverResource以适应新的签名
+async function wrappedRecoverResource(event, resource) {
+  await recoverResource(resource)
+}
+
+// 包装adjustHp以适应新的签名
+async function wrappedAdjustHp(event, delta) {
+  await adjustHp(delta)
+}
+
+// 包装adjustStat以适应新的签名
+async function wrappedAdjustStat(event, statName, delta) {
+  await adjustStat(statName, delta)
+}
+
+// 包装adjustLevel以适应新的签名
+async function wrappedAdjustLevel(event, delta) {
+  await adjustLevel(delta)
+}
+
+// 包装longRest以适应新的签名
+async function wrappedLongRest(event) {
+  await longRest()
+}
+
 function setEffectRef(resourceId, el) {
   if (el) {
     effectRefs.value.set(resourceId, el)
@@ -556,13 +609,15 @@ onMounted(async () => {
                 </span>
                 <div class="flex gap-2">
                   <button
-                    @click="adjustHp(-1)"
+                    @touchend.prevent="handleTouchOrClick(wrappedAdjustHp, $event, -1)"
+                    @click="handleTouchOrClick(wrappedAdjustHp, $event, -1)"
                     class="wood-button w-10 h-10 rounded-xl font-bold text-lg transform hover:scale-110 transition-all duration-200"
                   >
                     −
                   </button>
                   <button
-                    @click="adjustHp(1)"
+                    @touchend.prevent="handleTouchOrClick(wrappedAdjustHp, $event, 1)"
+                    @click="handleTouchOrClick(wrappedAdjustHp, $event, 1)"
                     class="wood-button w-10 h-10 rounded-xl font-bold text-lg transform hover:scale-110 transition-all duration-200"
                   >
                     +
@@ -664,14 +719,16 @@ onMounted(async () => {
               <div class="text-xs mb-2" style="color: #5d4025;">检定 {{ stat.modifier }}</div>
               <div class="flex gap-1 justify-center">
                 <button
-                  @click="adjustStat(stat.nameEn === 'STR' ? 'strength' : stat.nameEn === 'DEX' ? 'dexterity' : stat.nameEn === 'CON' ? 'constitution' : stat.nameEn === 'INT' ? 'intelligence' : stat.nameEn === 'WIS' ? 'wisdom' : 'charisma', -1)"
+                  @touchend.prevent="handleTouchOrClick(wrappedAdjustStat, $event, stat.nameEn === 'STR' ? 'strength' : stat.nameEn === 'DEX' ? 'dexterity' : stat.nameEn === 'CON' ? 'constitution' : stat.nameEn === 'INT' ? 'intelligence' : stat.nameEn === 'WIS' ? 'wisdom' : 'charisma', -1)"
+                  @click="handleTouchOrClick(wrappedAdjustStat, $event, stat.nameEn === 'STR' ? 'strength' : stat.nameEn === 'DEX' ? 'dexterity' : stat.nameEn === 'CON' ? 'constitution' : stat.nameEn === 'INT' ? 'intelligence' : stat.nameEn === 'WIS' ? 'wisdom' : 'charisma', -1)"
                   :disabled="stat.value <= 1"
                   class="flex-1 wood-button disabled:cursor-not-allowed py-1 rounded font-bold text-xs disabled:opacity-50"
                 >
                   −
                 </button>
                 <button
-                  @click="adjustStat(stat.nameEn === 'STR' ? 'strength' : stat.nameEn === 'DEX' ? 'dexterity' : stat.nameEn === 'CON' ? 'constitution' : stat.nameEn === 'INT' ? 'intelligence' : stat.nameEn === 'WIS' ? 'wisdom' : 'charisma', 1)"
+                  @touchend.prevent="handleTouchOrClick(wrappedAdjustStat, $event, stat.nameEn === 'STR' ? 'strength' : stat.nameEn === 'DEX' ? 'dexterity' : stat.nameEn === 'CON' ? 'constitution' : stat.nameEn === 'INT' ? 'intelligence' : stat.nameEn === 'WIS' ? 'wisdom' : 'charisma', 1)"
+                  @click="handleTouchOrClick(wrappedAdjustStat, $event, stat.nameEn === 'STR' ? 'strength' : stat.nameEn === 'DEX' ? 'dexterity' : stat.nameEn === 'CON' ? 'constitution' : stat.nameEn === 'INT' ? 'intelligence' : stat.nameEn === 'WIS' ? 'wisdom' : 'charisma', 1)"
                   :disabled="stat.value >= 30"
                   class="flex-1 wood-button disabled:cursor-not-allowed py-1 rounded font-bold text-xs disabled:opacity-50"
                 >
@@ -687,7 +744,8 @@ onMounted(async () => {
               <span class="font-medium" style="color: #5d4025;">等级</span>
               <div class="flex items-center gap-3">
                 <button
-                  @click="adjustLevel(-1)"
+                  @touchend.prevent="handleTouchOrClick(wrappedAdjustLevel, $event, -1)"
+                  @click="handleTouchOrClick(wrappedAdjustLevel, $event, -1)"
                   :disabled="character.level <= 1"
                   class="wood-button w-8 h-8 disabled:cursor-not-allowed rounded-lg font-bold text-sm disabled:opacity-50"
                 >
@@ -695,7 +753,8 @@ onMounted(async () => {
                 </button>
                 <span class="text-2xl font-black" style="color: #8b4513;">Lv. {{ character.level }}</span>
                 <button
-                  @click="adjustLevel(1)"
+                  @touchend.prevent="handleTouchOrClick(wrappedAdjustLevel, $event, 1)"
+                  @click="handleTouchOrClick(wrappedAdjustLevel, $event, 1)"
                   :disabled="character.level >= 20"
                   class="wood-button w-8 h-8 disabled:cursor-not-allowed rounded-lg font-bold text-sm disabled:opacity-50"
                 >
@@ -710,7 +769,8 @@ onMounted(async () => {
         <div class="resource-panel wood-texture iron-border rounded-2xl p-6">
           <!-- 长休按钮 -->
           <button
-            @click="longRest"
+            @touchend.prevent="handleTouchOrClick(wrappedLongRest, $event)"
+            @click="handleTouchOrClick(wrappedLongRest, $event)"
             class="wood-button w-full mb-6 font-heading font-black py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-3"
           >
             <span class="text-2xl">🌙</span>
@@ -758,7 +818,8 @@ onMounted(async () => {
               <div class="flex gap-2 relative" style="position: relative;">
                 <button
                   :id="`use-btn-${resource.id}`"
-                  @click="useResourceWithEffect(resource, $event)"
+                  @touchend.prevent="handleTouchOrClick(wrappedUseResource, $event, resource)"
+                  @click="handleTouchOrClick(wrappedUseResource, $event, resource)"
                   :disabled="resource.currentValue <= 0"
                   class="flex-1 wood-button disabled:cursor-not-allowed py-3 rounded-xl text-sm font-bold disabled:opacity-50 relative z-10"
                   style="position: relative;"
@@ -766,7 +827,8 @@ onMounted(async () => {
                   使用 (-1)
                 </button>
                 <button
-                  @click="recoverResource(resource)"
+                  @touchend.prevent="handleTouchOrClick(wrappedRecoverResource, $event, resource)"
+                  @click="handleTouchOrClick(wrappedRecoverResource, $event, resource)"
                   :disabled="resource.currentValue >= resource.maxValue"
                   class="flex-1 wood-button disabled:cursor-not-allowed py-3 rounded-xl text-sm font-bold disabled:opacity-50 relative z-10"
                 >
