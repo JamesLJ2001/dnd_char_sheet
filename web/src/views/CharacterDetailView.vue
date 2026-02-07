@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, nextTick, watchEffect } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCharacterStore } from '../stores/character'
 
@@ -10,26 +10,8 @@ const characterStore = useCharacterStore()
 const characterId = computed(() => parseInt(route.params.id))
 const loading = ref(true)
 
-// iOS Safari 修复：使用 watchEffect + ref 强制触发响应式更新
-const character = ref(null)
-const refreshKey = ref(0)
-
-// 监听 store 变化并强制更新
-watchEffect(() => {
-  const char = characterStore.getCharacterById(characterId.value)
-  if (char) {
-    // 创建新对象引用，强制 iOS Safari 识别变化
-    character.value = { ...char, _forceUpdate: refreshKey.value }
-  }
-})
-
-// 强制刷新函数
-function forceRefresh() {
-  refreshKey.value++
-  nextTick(() => {
-    console.log('🔄 [iOS] Forced refresh, character:', character.value)
-  })
-}
+// 简化：直接使用 computed 绑定 Store 数据
+const character = computed(() => characterStore.getCharacterById(characterId.value))
 
 // 六维属性数据
 const stats = computed(() => {
@@ -191,12 +173,7 @@ const saves = computed(() => {
 // HP 调整
 async function adjustHp(delta) {
   try {
-    console.log('📱 [iOS] adjustHp called, delta:', delta)
     await characterStore.adjustHp(characterId.value, delta)
-    // iOS Safari: 强制刷新
-    forceRefresh()
-    await nextTick()
-
     // 检测死亡
     if (character.value && character.value.currentHp <= 0) {
       showDeathModal.value = true
@@ -210,11 +187,7 @@ async function adjustHp(delta) {
 async function useResource(resource) {
   if (resource.currentValue <= 0) return
   try {
-    console.log('📱 [iOS] useResource called, resource:', resource.resourceName)
     await characterStore.updateResource(characterId.value, resource.id, -1)
-    // iOS Safari: 强制刷新
-    forceRefresh()
-    await nextTick()
   } catch (err) {
     console.error('Failed to use resource:', err)
   }
@@ -224,11 +197,7 @@ async function useResource(resource) {
 async function recoverResource(resource) {
   if (resource.currentValue >= resource.maxValue) return
   try {
-    console.log('📱 [iOS] recoverResource called, resource:', resource.resourceName)
     await characterStore.updateResource(characterId.value, resource.id, 1)
-    // iOS Safari: 强制刷新
-    forceRefresh()
-    await nextTick()
   } catch (err) {
     console.error('Failed to recover resource:', err)
   }
@@ -237,11 +206,7 @@ async function recoverResource(resource) {
 // 长休
 async function longRest() {
   try {
-    console.log('📱 [iOS] longRest called')
     await characterStore.longRest(characterId.value)
-    // iOS Safari: 强制刷新
-    forceRefresh()
-    await nextTick()
   } catch (err) {
     console.error('Failed to long rest:', err)
   }
@@ -266,65 +231,6 @@ const effectRefs = ref(new Map())
 // 死亡弹窗状态
 const showDeathModal = ref(false)
 const isDying = ref(false)
-
-// iOS Safari 触摸事件防抖
-const touchLock = ref(false)
-let touchTimer = null
-
-// 通用的触摸/点击处理函数（带防抖）
-async function handleTouchOrClick(handler, event, ...args) {
-  // 如果在触摸锁定期，忽略click事件（防止重复执行）
-  if (touchLock.value) {
-    console.log('🔒 [TOUCH] Locked, ignoring duplicate click')
-    return
-  }
-
-  // 执行处理函数（传递event作为第一个参数）
-  await handler(event, ...args)
-
-  // 触摸后的短暂锁定期，防止iOS的click重复触发
-  touchLock.value = true
-  clearTimeout(touchTimer)
-  touchTimer = setTimeout(() => {
-    touchLock.value = false
-  }, 300)
-}
-
-// 包装useResourceWithEffect以适应新的签名
-async function wrappedUseResource(event, resource) {
-  await useResourceWithEffect(resource, event)
-}
-
-// 包装recoverResource以适应新的签名
-async function wrappedRecoverResource(event, resource) {
-  await recoverResource(resource)
-}
-
-// 包装adjustHp以适应新的签名
-async function wrappedAdjustHp(event, delta) {
-  await adjustHp(delta)
-}
-
-// 包装adjustStat以适应新的签名
-async function wrappedAdjustStat(event, statName, delta) {
-  await adjustStat(statName, delta)
-}
-
-// 包装adjustLevel以适应新的签名
-async function wrappedAdjustLevel(event, delta) {
-  await adjustLevel(delta)
-}
-
-// 包装longRest以适应新的签名
-async function wrappedLongRest(event) {
-  await longRest()
-}
-
-function setEffectRef(resourceId, el) {
-  if (el) {
-    effectRefs.value.set(resourceId, el)
-  }
-}
 
 function getEffectClass(resourceName) {
   const name = resourceName.toLowerCase()
@@ -542,11 +448,7 @@ async function adjustLevel(delta) {
   if (newLevel < 1 || newLevel > 20) return
 
   try {
-    console.log('📱 [iOS] adjustLevel called, newLevel:', newLevel)
     await characterStore.updateCharacter(characterId.value, { level: newLevel })
-    // iOS Safari: 强制刷新
-    forceRefresh()
-    await nextTick()
   } catch (err) {
     console.error('Failed to adjust level:', err)
   }
@@ -560,11 +462,7 @@ async function adjustStat(statName, delta) {
   if (newValue < 1 || newValue > 30) return
 
   try {
-    console.log('📱 [iOS] adjustStat called, stat:', statName, 'newValue:', newValue)
     await characterStore.updateCharacter(characterId.value, { [statName]: newValue })
-    // iOS Safari: 强制刷新
-    forceRefresh()
-    await nextTick()
   } catch (err) {
     console.error('Failed to adjust stat:', err)
   }
@@ -644,16 +542,14 @@ onMounted(async () => {
                 </span>
                 <div class="flex gap-2">
                   <button
-                    @touchstart="handleTouchOrClick(wrappedAdjustHp, $event, -1)"
-                    @click="handleTouchOrClick(wrappedAdjustHp, $event, -1)"
-                    class="wood-button w-10 h-10 rounded-xl font-bold text-lg transform hover:scale-110 transition-all duration-200"
+                    @click.prevent="adjustHp(-1)"
+                    class="wood-button w-10 h-10 rounded-xl font-bold text-lg transform hover:scale-110 active:scale-95 transition-all duration-200"
                   >
                     −
                   </button>
                   <button
-                    @touchstart="handleTouchOrClick(wrappedAdjustHp, $event, 1)"
-                    @click="handleTouchOrClick(wrappedAdjustHp, $event, 1)"
-                    class="wood-button w-10 h-10 rounded-xl font-bold text-lg transform hover:scale-110 transition-all duration-200"
+                    @click.prevent="adjustHp(1)"
+                    class="wood-button w-10 h-10 rounded-xl font-bold text-lg transform hover:scale-110 active:scale-95 transition-all duration-200"
                   >
                     +
                   </button>
@@ -754,18 +650,16 @@ onMounted(async () => {
               <div class="text-xs mb-2" style="color: #5d4025;">检定 {{ stat.modifier }}</div>
               <div class="flex gap-1 justify-center">
                 <button
-                  @touchstart="handleTouchOrClick(wrappedAdjustStat, $event, stat.nameEn === 'STR' ? 'strength' : stat.nameEn === 'DEX' ? 'dexterity' : stat.nameEn === 'CON' ? 'constitution' : stat.nameEn === 'INT' ? 'intelligence' : stat.nameEn === 'WIS' ? 'wisdom' : 'charisma', -1)"
-                  @click="handleTouchOrClick(wrappedAdjustStat, $event, stat.nameEn === 'STR' ? 'strength' : stat.nameEn === 'DEX' ? 'dexterity' : stat.nameEn === 'CON' ? 'constitution' : stat.nameEn === 'INT' ? 'intelligence' : stat.nameEn === 'WIS' ? 'wisdom' : 'charisma', -1)"
+                  @click.prevent="adjustStat(stat.nameEn === 'STR' ? 'strength' : stat.nameEn === 'DEX' ? 'dexterity' : stat.nameEn === 'CON' ? 'constitution' : stat.nameEn === 'INT' ? 'intelligence' : stat.nameEn === 'WIS' ? 'wisdom' : 'charisma', -1)"
                   :disabled="stat.value <= 1"
-                  class="flex-1 wood-button disabled:cursor-not-allowed py-1 rounded font-bold text-xs disabled:opacity-50"
+                  class="flex-1 wood-button disabled:cursor-not-allowed py-1 rounded font-bold text-xs disabled:opacity-50 active:scale-95"
                 >
                   −
                 </button>
                 <button
-                  @touchstart="handleTouchOrClick(wrappedAdjustStat, $event, stat.nameEn === 'STR' ? 'strength' : stat.nameEn === 'DEX' ? 'dexterity' : stat.nameEn === 'CON' ? 'constitution' : stat.nameEn === 'INT' ? 'intelligence' : stat.nameEn === 'WIS' ? 'wisdom' : 'charisma', 1)"
-                  @click="handleTouchOrClick(wrappedAdjustStat, $event, stat.nameEn === 'STR' ? 'strength' : stat.nameEn === 'DEX' ? 'dexterity' : stat.nameEn === 'CON' ? 'constitution' : stat.nameEn === 'INT' ? 'intelligence' : stat.nameEn === 'WIS' ? 'wisdom' : 'charisma', 1)"
+                  @click.prevent="adjustStat(stat.nameEn === 'STR' ? 'strength' : stat.nameEn === 'DEX' ? 'dexterity' : stat.nameEn === 'CON' ? 'constitution' : stat.nameEn === 'INT' ? 'intelligence' : stat.nameEn === 'WIS' ? 'wisdom' : 'charisma', 1)"
                   :disabled="stat.value >= 30"
-                  class="flex-1 wood-button disabled:cursor-not-allowed py-1 rounded font-bold text-xs disabled:opacity-50"
+                  class="flex-1 wood-button disabled:cursor-not-allowed py-1 rounded font-bold text-xs disabled:opacity-50 active:scale-95"
                 >
                   +
                 </button>
@@ -779,19 +673,17 @@ onMounted(async () => {
               <span class="font-medium" style="color: #5d4025;">等级</span>
               <div class="flex items-center gap-3">
                 <button
-                  @touchstart="handleTouchOrClick(wrappedAdjustLevel, $event, -1)"
-                  @click="handleTouchOrClick(wrappedAdjustLevel, $event, -1)"
+                  @click.prevent="adjustLevel(-1)"
                   :disabled="character.level <= 1"
-                  class="wood-button w-8 h-8 disabled:cursor-not-allowed rounded-lg font-bold text-sm disabled:opacity-50"
+                  class="wood-button w-8 h-8 disabled:cursor-not-allowed rounded-lg font-bold text-sm disabled:opacity-50 active:scale-95"
                 >
                   −
                 </button>
                 <span class="text-2xl font-black" style="color: #8b4513;">Lv. {{ character.level }}</span>
                 <button
-                  @touchstart="handleTouchOrClick(wrappedAdjustLevel, $event, 1)"
-                  @click="handleTouchOrClick(wrappedAdjustLevel, $event, 1)"
+                  @click.prevent="adjustLevel(1)"
                   :disabled="character.level >= 20"
-                  class="wood-button w-8 h-8 disabled:cursor-not-allowed rounded-lg font-bold text-sm disabled:opacity-50"
+                  class="wood-button w-8 h-8 disabled:cursor-not-allowed rounded-lg font-bold text-sm disabled:opacity-50 active:scale-95"
                 >
                   +
                 </button>
@@ -804,9 +696,8 @@ onMounted(async () => {
         <div class="resource-panel wood-texture iron-border rounded-2xl p-6">
           <!-- 长休按钮 -->
           <button
-            @touchstart="handleTouchOrClick(wrappedLongRest, $event)"
-            @click="handleTouchOrClick(wrappedLongRest, $event)"
-            class="wood-button w-full mb-6 font-heading font-black py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-3"
+            @click.prevent="longRest"
+            class="wood-button w-full mb-6 font-heading font-black py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3"
           >
             <span class="text-2xl">🌙</span>
             <span class="text-lg font-heavy">长休 (Long Rest)</span>
@@ -853,19 +744,17 @@ onMounted(async () => {
               <div class="flex gap-2 relative" style="position: relative;">
                 <button
                   :id="`use-btn-${resource.id}`"
-                  @touchstart="handleTouchOrClick(wrappedUseResource, $event, resource)"
-                  @click="handleTouchOrClick(wrappedUseResource, $event, resource)"
+                  @click.prevent="useResourceWithEffect(resource, $event)"
                   :disabled="resource.currentValue <= 0"
-                  class="flex-1 wood-button disabled:cursor-not-allowed py-3 rounded-xl text-sm font-bold disabled:opacity-50 relative z-10"
+                  class="flex-1 wood-button disabled:cursor-not-allowed py-3 rounded-xl text-sm font-bold disabled:opacity-50 relative z-10 active:scale-95"
                   style="position: relative;"
                 >
                   使用 (-1)
                 </button>
                 <button
-                  @touchstart="handleTouchOrClick(wrappedRecoverResource, $event, resource)"
-                  @click="handleTouchOrClick(wrappedRecoverResource, $event, resource)"
+                  @click.prevent="recoverResource(resource)"
                   :disabled="resource.currentValue >= resource.maxValue"
-                  class="flex-1 wood-button disabled:cursor-not-allowed py-3 rounded-xl text-sm font-bold disabled:opacity-50 relative z-10"
+                  class="flex-1 wood-button disabled:cursor-not-allowed py-3 rounded-xl text-sm font-bold disabled:opacity-50 relative z-10 active:scale-95"
                 >
                   恢复 (+1)
                 </button>

@@ -23,60 +23,68 @@ export const useCharacterStore = defineStore('character', () => {
 
   async function updateCharacter(id, payload) {
     try {
-      const response = await axios.put(`/api/characters/${id}`, payload)
-      // 更新本地状态 - 使用 splice 确保 iOS Safari 触发响应式更新
+      // 添加时间戳参数，强制破解 iOS Safari 缓存
+      const response = await axios.put(`/api/characters/${id}?t=${Date.now()}`, payload)
+      // 直接替换整个对象，简单高效
       const index = characters.value.findIndex(char => char.id === id)
       if (index !== -1) {
-        characters.value.splice(index, 1, { ...characters.value[index], ...response.data })
+        characters.value[index] = response.data
+        console.log('✅ [Store] Updated character:', response.data.name, response.data)
       }
       return response.data
     } catch (err) {
-      console.error('Failed to update character:', err)
+      console.error('❌ [Store] Failed to update character:', err)
       throw err
     }
   }
 
   async function adjustHp(charId, delta) {
     try {
-      const response = await axios.patch(`/api/characters/${charId}/hp`, { delta })
-      // 更新本地状态 - 使用 splice 确保 iOS Safari 触发响应式更新
+      // 添加时间戳参数，强制破解 iOS Safari 缓存
+      const response = await axios.patch(`/api/characters/${charId}/hp?t=${Date.now()}`, { delta })
+      // 直接替换整个对象
       const index = characters.value.findIndex(char => char.id === charId)
       if (index !== -1) {
-        characters.value.splice(index, 1, { ...characters.value[index], ...response.data })
+        characters.value[index] = response.data
+        console.log('✅ [Store] HP adjusted:', response.data.currentHp, '/', response.data.maxHp)
       }
       return response.data
     } catch (err) {
-      console.error('Failed to adjust HP:', err)
+      console.error('❌ [Store] Failed to adjust HP:', err)
       throw err
     }
   }
 
   async function updateResource(charId, resId, delta) {
     try {
-      const response = await axios.patch(`/api/characters/${charId}/resources/${resId}`, { delta })
-      // 更新本地状态 - 使用 splice 确保 iOS Safari 触发响应式更新
+      // 添加时间戳参数，强制破解 iOS Safari 缓存
+      const response = await axios.patch(`/api/characters/${charId}/resources/${resId}?t=${Date.now()}`, { delta })
+      // 直接替换整个对象
       const index = characters.value.findIndex(char => char.id === charId)
       if (index !== -1) {
-        characters.value.splice(index, 1, { ...characters.value[index], ...response.data })
+        characters.value[index] = response.data
+        console.log('✅ [Store] Resource updated')
       }
       return response.data
     } catch (err) {
-      console.error('Failed to update resource:', err)
+      console.error('❌ [Store] Failed to update resource:', err)
       throw err
     }
   }
 
   async function longRest(charId) {
     try {
-      const response = await axios.post(`/api/characters/${charId}/long-rest`)
-      // 更新本地状态 - 使用 splice 确保 iOS Safari 触发响应式更新
+      // 添加时间戳参数，强制破解 iOS Safari 缓存
+      const response = await axios.post(`/api/characters/${charId}/long-rest?t=${Date.now()}`)
+      // 直接替换整个对象
       const index = characters.value.findIndex(char => char.id === charId)
       if (index !== -1) {
-        characters.value.splice(index, 1, { ...characters.value[index], ...response.data })
+        characters.value[index] = response.data
+        console.log('✅ [Store] Long rest completed')
       }
       return response.data
     } catch (err) {
-      console.error('Failed to long rest:', err)
+      console.error('❌ [Store] Failed to long rest:', err)
       throw err
     }
   }
